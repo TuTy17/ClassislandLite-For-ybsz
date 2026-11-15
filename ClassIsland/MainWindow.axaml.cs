@@ -9,6 +9,8 @@ using System.Runtime.Versioning;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Animation;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Metadata;
@@ -20,6 +22,7 @@ using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using ClassIsland.Controls;
@@ -1707,7 +1710,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         Dispatcher.UIThread.Post(ExpandRecipePanel, DispatcherPriority.Loaded);
     }
 
-    private void ExpandRecipePanel()
+    private async void ExpandRecipePanel()
     {
         if (!RecipeService.IsVisible || RecipeMainOverlay == null)
         {
@@ -1723,20 +1726,54 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         RecipeMainOverlay.Height = 0;
         RecipeMainOverlay.Transitions = transitions;
 
-        // 面板现在位于主界面窗口内的独立图层，窗口需要显式让出这段空间。
+        // 面板位于主界面窗口内的独立图层，窗口需要显式让出这段空间。
         _recipePanelExtraHeight = _recipePanelMargin.Top + targetHeight;
         UpdateWindowPos();
 
-        Dispatcher.UIThread.Post(() =>
+        var animation = new Animation
         {
-            if (!RecipeService.IsVisible)
+            Duration = TimeSpan.FromMilliseconds(260),
+            Easing = new CubicEaseOut(),
+            FillMode = FillMode.Forward,
+            Children =
             {
-                return;
+                new KeyFrame
+                {
+                    Cue = new Cue(0d),
+                    Setters =
+                    {
+                        new Setter(OpacityProperty, 0d),
+                        new Setter(HeightProperty, 0d)
+                    }
+                },
+                new KeyFrame
+                {
+                    Cue = new Cue(1d),
+                    Setters =
+                    {
+                        new Setter(OpacityProperty, 1d),
+                        new Setter(HeightProperty, targetHeight)
+                    }
+                }
             }
+        };
 
-            RecipeMainOverlay.Height = targetHeight;
-            RecipeMainOverlay.Opacity = 1;
-        }, DispatcherPriority.Render);
+        try
+        {
+            await animation.RunAsync(RecipeMainOverlay);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogDebug(exception, "食谱面板展开动画失败，直接显示面板。");
+        }
+
+        if (!RecipeService.IsVisible)
+        {
+            return;
+        }
+
+        RecipeMainOverlay.Height = targetHeight;
+        RecipeMainOverlay.Opacity = 1;
     }
 
     private void HideRecipePanel()
