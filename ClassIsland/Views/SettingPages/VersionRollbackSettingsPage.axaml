@@ -1,0 +1,69 @@
+<controls:SettingsPageBase x:Class="ClassIsland.Views.SettingPages.VersionRollbackSettingsPage"
+                           xmlns="https://github.com/avaloniaui"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:controls="clr-namespace:ClassIsland.Core.Abstractions.Controls;assembly=ClassIsland.Core"
+                           xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+                           xmlns:ci="http://classisland.tech/schemas/xaml/core"
+                           x:ClassModifier="public">
+    <ScrollViewer>
+        <StackPanel Classes="settings-container animated-intro" Margin="12">
+            <ui:InfoBar IsOpen="True"
+                        Severity="Informational"
+                        Title="版本回退"
+                        Message="把当前程序目录保存成快照。以后如果新版本在学校里出问题，可以在这里一键回退到保存过的版本。回退只替换程序文件，课表、设置等数据不会改动。" />
+
+            <ui:SettingsExpander Header="当前版本" IsExpanded="True"
+                                 IconSource="{ci:FluentIconSource &#xE7BA;}">
+                <ui:SettingsExpanderItem Content="版本目录">
+                    <TextBlock Text="{Binding ViewModel.CurrentVersionText}" TextWrapping="Wrap" />
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="程序位置">
+                    <TextBlock Text="{Binding ViewModel.CurrentAppDirectory}" TextWrapping="Wrap" Classes="l-secondary" />
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="立即备份当前版本">
+                    <ui:SettingsExpanderItem.Footer>
+                        <Button Content="创建快照"
+                                Click="ButtonCreateSnapshot_OnClick"
+                                IsEnabled="{Binding !ViewModel.IsBusy}" />
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
+            </ui:SettingsExpander>
+
+            <ui:SettingsExpander Header="已保存的快照" IsExpanded="True"
+                                 IconSource="{ci:FluentIconSource &#xE81C;}">
+                <ui:InfoBar IsOpen="True"
+                            IsVisible="{Binding !ViewModel.HasSnapshots}"
+                            Severity="Warning"
+                            Title="还没有快照"
+                            Message="建议现在先点一次“创建快照”，把确认好用的版本存下来。" />
+                <ItemsControl ItemsSource="{Binding ViewModel.Snapshots}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,4">
+                                <StackPanel Spacing="2" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding VersionText}" FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding CreatedAtText}" Classes="l-secondary" />
+                                    <TextBlock Text="{Binding SizeText}" Classes="l-secondary" />
+                                </StackPanel>
+                                <Button Grid.Column="1"
+                                        Content="回退到此版本"
+                                        Margin="8,0"
+                                        VerticalAlignment="Center"
+                                        Click="ButtonRestoreSnapshot_OnClick"
+                                        Tag="{Binding}" />
+                                <Button Grid.Column="2"
+                                        Content="删除"
+                                        VerticalAlignment="Center"
+                                        Click="ButtonDeleteSnapshot_OnClick"
+                                        Tag="{Binding}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <ui:SettingsExpanderItem Content="状态">
+                    <TextBlock Text="{Binding ViewModel.StatusText}" TextWrapping="Wrap" />
+                </ui:SettingsExpanderItem>
+            </ui:SettingsExpander>
+        </StackPanel>
+    </ScrollViewer>
+</controls:SettingsPageBase>

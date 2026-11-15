@@ -21,6 +21,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Media.Transformation;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -1725,6 +1726,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         RecipeMainOverlay.Transitions = null;
         RecipeMainOverlay.MaxHeight = 0;
         RecipeMainOverlay.Opacity = 0;
+        RecipeMainOverlay.RenderTransform = TransformOperations.Parse("scale(0.9,0.3)");
         RecipeMainOverlay.IsVisible = true;
         RecipeMainOverlay.Transitions = transitions;
 
@@ -1754,11 +1756,13 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         _recipePanelAnimating = true;
         UpdateWindowPos();
 
-        RecipeMainOverlay.MaxHeight = 0;
+        // 布局高度直接到位，动画只作用于渲染变换：
+        // 面板从课表条下方（顶部中心）缩放展开，视觉上就是“从主界面弹出来”。
+        RecipeMainOverlay.MaxHeight = _recipePanelMaxHeight;
         RecipeMainOverlay.Opacity = 0;
+        RecipeMainOverlay.RenderTransform = TransformOperations.Parse("scale(0.9,0.3)");
         RecipeMainOverlay.Transitions = transitions;
 
-        // MaxHeight 从 0 过渡到上限，面板高度本身随文本自适应，不会出现多余留白。
         Dispatcher.UIThread.Post(() =>
         {
             if (!RecipeService.IsVisible)
@@ -1766,8 +1770,8 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
                 return;
             }
 
-            RecipeMainOverlay.MaxHeight = _recipePanelMaxHeight;
             RecipeMainOverlay.Opacity = 1;
+            RecipeMainOverlay.RenderTransform = TransformOperations.Parse("scale(1)");
         }, DispatcherPriority.Render);
 
         DispatcherTimer.RunOnce(() =>
@@ -1810,8 +1814,8 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         var transitions = RecipeMainOverlay.Transitions;
         RecipeMainOverlay.Transitions = null;
         RecipeMainOverlay.Opacity = 0;
+        RecipeMainOverlay.RenderTransform = TransformOperations.Parse("scale(0.9,0.3)");
         RecipeMainOverlay.Transitions = transitions;
-        RecipeMainOverlay.MaxHeight = 0;
 
         _recipeCollapseTimer?.Dispose();
         _recipeCollapseTimer = DispatcherTimer.RunOnce(() =>

@@ -115,6 +115,7 @@ public partial class App
         services.AddTransient<ExperimentalSettingsViewModel>();
         services.AddTransient<DecibelSettingsViewModel>();
         services.AddTransient<FullscreenReminderSettingsViewModel>();
+        services.AddTransient<VersionRollbackSettingsViewModel>();
         // Views
         services.AddTransient<ITopmostEffectPlayer>(x => x.GetRequiredService<TopmostEffectWindow>());
         services.AddSingleton<MainWindow>();
@@ -166,6 +167,7 @@ public partial class App
         services.AddSettingsPage<ExperimentalSettingsPage>();
         services.AddSettingsPage<DecibelSettingsPage>();
         services.AddSettingsPage<FullscreenReminderSettingsPage>();
+        services.AddSettingsPage<VersionRollbackSettingsPage>();
         // 主界面组件
         services.AddComponent<TextComponent, TextComponentSettingsControl>();
         services.AddComponent<SeparatorComponent>();
