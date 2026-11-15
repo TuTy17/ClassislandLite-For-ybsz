@@ -17,4 +17,11 @@ public partial class FullscreenReminderSettingsPage : SettingsPageBase
         InitializeComponent();
         DataContext = this;
     }
+
+    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        // 设置页会被缓存，重新进入时按当前档案刷新课程列表。
+        ViewModel.Refresh();
+    }
 }

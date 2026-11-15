@@ -53,6 +53,11 @@
                 <ui:SettingsExpanderItem Content="识别状态">
                     <TextBlock Text="{Binding ViewModel.RecipeService.StatusText}" TextWrapping="Wrap" />
                 </ui:SettingsExpanderItem>
+                <ui:InfoBar IsOpen="True"
+                            IsVisible="{Binding !ViewModel.HasRecipeLessonChoices}"
+                            Severity="Warning"
+                            Title="还没有可选的课程"
+                            Message="当前档案里还没有时间表或课程，午餐、晚餐触发课程暂时无法选择。请先在档案编辑器中创建时间表和课程表，保存后回到本页即可选择。" />
                 <ui:SettingsExpanderItem Content="午餐显示课程">
                     <ui:SettingsExpanderItem.Footer>
                         <ComboBox Width="380"

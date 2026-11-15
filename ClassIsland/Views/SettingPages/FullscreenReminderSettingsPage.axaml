@@ -11,6 +11,11 @@
                         Severity="Informational"
                         Title="全屏强调提醒"
                         Message="勾选课程后，该课程开始时将播放 ClassIsland 原有的全屏波纹强调特效；未勾选的课程不会播放。" />
+            <ui:InfoBar IsOpen="True"
+                        IsVisible="{Binding !ViewModel.HasLessonChoices}"
+                        Severity="Warning"
+                        Title="还没有可勾选的课程"
+                        Message="当前档案里还没有时间表或课程。请先在档案编辑器中创建时间表和课程表，保存后回到本页即可按课勾选。" />
             <ItemsControl ItemsSource="{Binding ViewModel.LessonChoices}" Margin="0,12,0,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>

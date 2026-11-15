@@ -25,6 +25,13 @@ public partial class ExperimentalSettingsPage : SettingsPageBase
         DataContext = this;
     }
 
+    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        // 设置页会被缓存，重新进入时按当前档案刷新课程下拉列表。
+        ViewModel.RefreshLessonChoices();
+    }
+
     private async void ButtonImportRecipe_OnClick(object? sender, RoutedEventArgs e)
     {
         var root = TopLevel.GetTopLevel(this);

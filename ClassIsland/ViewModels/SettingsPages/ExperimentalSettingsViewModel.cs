@@ -10,10 +10,14 @@ namespace ClassIsland.ViewModels.SettingsPages;
 
 public sealed class ExperimentalSettingsViewModel : ObservableRecipient
 {
+    private readonly IProfileService _profileService;
+
     public SettingsService SettingsService { get; }
     public RecipeService RecipeService { get; }
     public QqNotificationMirrorService QqNotificationMirrorService { get; }
     public ObservableCollection<LessonTimePointChoice> RecipeLessonChoices { get; } = [];
+
+    public bool HasRecipeLessonChoices => RecipeLessonChoices.Count > 0;
 
     public ExperimentalSettingsViewModel(
         SettingsService settingsService,
@@ -22,10 +26,19 @@ public sealed class ExperimentalSettingsViewModel : ObservableRecipient
         QqNotificationMirrorService qqNotificationMirrorService)
     {
         SettingsService = settingsService;
+        _profileService = profileService;
         RecipeService = recipeService;
         QqNotificationMirrorService = qqNotificationMirrorService;
+        RefreshLessonChoices();
+    }
 
-        foreach (var (layoutId, layout) in profileService.Profile.TimeLayouts.OrderBy(pair => pair.Value.Name))
+    /// <summary>
+    /// 按当前档案重建课程列表。设置页可能被缓存，档案里的时间表变化后需要重新读取。
+    /// </summary>
+    public void RefreshLessonChoices()
+    {
+        RecipeLessonChoices.Clear();
+        foreach (var (layoutId, layout) in _profileService.Profile.TimeLayouts.OrderBy(pair => pair.Value.Name))
         {
             var lessonNumber = 0;
             foreach (var item in layout.Layouts.Where(item => item.TimeType == 0))
@@ -38,5 +51,7 @@ public sealed class ExperimentalSettingsViewModel : ObservableRecipient
                 });
             }
         }
+
+        OnPropertyChanged(nameof(HasRecipeLessonChoices));
     }
 }

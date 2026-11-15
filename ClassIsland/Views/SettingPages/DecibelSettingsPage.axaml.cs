@@ -21,6 +21,8 @@ public partial class DecibelSettingsPage : SettingsPageBase
 
     private async void Control_OnLoaded(object? sender, RoutedEventArgs e)
     {
+        // 设置页会被缓存，重新进入时按当前档案刷新课程时段列表。
+        ViewModel.RefreshLessonChoices();
         await ViewModel.RefreshDevicesAsync();
         if (ViewModel.SettingsService.Settings.IsDecibelMonitorEnabled)
         {

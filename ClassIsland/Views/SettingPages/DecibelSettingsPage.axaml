@@ -58,17 +58,24 @@
             <ui:SettingsExpander Header="小组件显示时段"
                                  Description="只有勾选的课程会显示“分贝显示”小组件。"
                                  IsExpanded="True">
-                <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto">
-                    <ItemsControl ItemsSource="{Binding ViewModel.VisibilityLessonChoices}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox Content="{Binding DisplayName}"
-                                          IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                          Margin="0,4" />
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                <StackPanel Spacing="8">
+                    <ui:InfoBar IsOpen="True"
+                                IsVisible="{Binding !ViewModel.HasVisibilityLessonChoices}"
+                                Severity="Informational"
+                                Title="还没有可勾选的课程"
+                                Message="当前档案里还没有时间表或课程。请先在档案编辑器中创建时间表和课程表，保存后回到本页即可按课勾选。" />
+                    <ScrollViewer MaxHeight="360" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding ViewModel.VisibilityLessonChoices}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding DisplayName}"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              Margin="0,4" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </StackPanel>
             </ui:SettingsExpander>
         </StackPanel>
     </ScrollViewer>

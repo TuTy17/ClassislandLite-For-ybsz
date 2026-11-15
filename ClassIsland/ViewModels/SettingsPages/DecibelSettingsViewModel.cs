@@ -11,10 +11,14 @@ namespace ClassIsland.ViewModels.SettingsPages;
 
 public sealed class DecibelSettingsViewModel : ObservableRecipient
 {
+    private readonly IProfileService _profileService;
+
     public SettingsService SettingsService { get; }
     public DecibelService DecibelService { get; }
     public ObservableCollection<string> DeviceNames { get; } = [];
     public ObservableCollection<LessonTimePointChoice> VisibilityLessonChoices { get; } = [];
+
+    public bool HasVisibilityLessonChoices => VisibilityLessonChoices.Count > 0;
 
     public string CurrentDecibelText => DecibelService.IsMonitoring
         ? $"{DecibelService.CurrentDecibel:0.0} dB"
@@ -30,9 +34,18 @@ public sealed class DecibelSettingsViewModel : ObservableRecipient
     {
         SettingsService = settingsService;
         DecibelService = decibelService;
+        _profileService = profileService;
         DecibelService.PropertyChanged += DecibelServiceOnPropertyChanged;
+        RefreshLessonChoices();
+    }
 
-        foreach (var (layoutId, layout) in profileService.Profile.TimeLayouts.OrderBy(pair => pair.Value.Name))
+    /// <summary>
+    /// 按当前档案重建“小组件显示时段”列表。设置页可能被缓存，档案里的时间表变化后需要重新读取。
+    /// </summary>
+    public void RefreshLessonChoices()
+    {
+        VisibilityLessonChoices.Clear();
+        foreach (var (layoutId, layout) in _profileService.Profile.TimeLayouts.OrderBy(pair => pair.Value.Name))
         {
             var lessonNumber = 0;
             foreach (var item in layout.Layouts.Where(item => item.TimeType == 0))
@@ -43,21 +56,23 @@ public sealed class DecibelSettingsViewModel : ObservableRecipient
                 {
                     Key = key,
                     DisplayName = $"{layout.Name} · 第 {lessonNumber} 节 · {LessonTimePointHelper.FormatRange(item.StartTime, item.EndTime)}",
-                    IsSelected = settingsService.Settings.DecibelVisibleLessonKeys.Contains(key),
+                    IsSelected = SettingsService.Settings.DecibelVisibleLessonKeys.Contains(key),
                     SelectionChanged = (choice, selected) =>
                     {
-                        if (selected && !settingsService.Settings.DecibelVisibleLessonKeys.Contains(choice.Key))
+                        if (selected && !SettingsService.Settings.DecibelVisibleLessonKeys.Contains(choice.Key))
                         {
-                            settingsService.Settings.DecibelVisibleLessonKeys.Add(choice.Key);
+                            SettingsService.Settings.DecibelVisibleLessonKeys.Add(choice.Key);
                         }
                         else if (!selected)
                         {
-                            settingsService.Settings.DecibelVisibleLessonKeys.Remove(choice.Key);
+                            SettingsService.Settings.DecibelVisibleLessonKeys.Remove(choice.Key);
                         }
                     }
                 });
             }
         }
+
+        OnPropertyChanged(nameof(HasVisibilityLessonChoices));
     }
 
     public async System.Threading.Tasks.Task RefreshDevicesAsync()
