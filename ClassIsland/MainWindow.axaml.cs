@@ -1710,7 +1710,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         Dispatcher.UIThread.Post(ExpandRecipePanel, DispatcherPriority.Loaded);
     }
 
-    private async void ExpandRecipePanel()
+    private void ExpandRecipePanel()
     {
         if (!RecipeService.IsVisible || RecipeMainOverlay == null)
         {
@@ -1730,50 +1730,17 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         _recipePanelExtraHeight = Math.Max(0, _recipePanelMargin.Top + targetHeight - GetMainWindowLineHeight());
         UpdateWindowPos();
 
-        var animation = new Animation
+        // 高度与透明度都带过渡，先落到 0，再在下一帧改到目标值，形成连贯的展开动画。
+        Dispatcher.UIThread.Post(() =>
         {
-            Duration = TimeSpan.FromMilliseconds(260),
-            Easing = new CubicEaseOut(),
-            FillMode = FillMode.Forward,
-            Children =
+            if (!RecipeService.IsVisible)
             {
-                new KeyFrame
-                {
-                    Cue = new Cue(0d),
-                    Setters =
-                    {
-                        new Setter(OpacityProperty, 0d),
-                        new Setter(HeightProperty, 0d)
-                    }
-                },
-                new KeyFrame
-                {
-                    Cue = new Cue(1d),
-                    Setters =
-                    {
-                        new Setter(OpacityProperty, 1d),
-                        new Setter(HeightProperty, targetHeight)
-                    }
-                }
+                return;
             }
-        };
 
-        try
-        {
-            await animation.RunAsync(RecipeMainOverlay);
-        }
-        catch (Exception exception)
-        {
-            Logger.LogDebug(exception, "食谱面板展开动画失败，直接显示面板。");
-        }
-
-        if (!RecipeService.IsVisible)
-        {
-            return;
-        }
-
-        RecipeMainOverlay.Height = targetHeight;
-        RecipeMainOverlay.Opacity = 1;
+            RecipeMainOverlay.Height = targetHeight;
+            RecipeMainOverlay.Opacity = 1;
+        }, DispatcherPriority.Render);
     }
 
     private void HideRecipePanel()
