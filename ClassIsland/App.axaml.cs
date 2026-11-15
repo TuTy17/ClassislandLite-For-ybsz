@@ -943,6 +943,12 @@ public partial class App : AppBase, IAppHost
             args.Cancel = true;
         };
         PhonyRootWindow.Show();
+
+        // 这个窗口只作为对话框的 owner 使用，本身不应该出现在屏幕上。
+        // 透明度在某些机器/驱动组合下不生效时，它会显示成屏幕中间的一个黑色小方块，
+        // 因此这里直接把它完全透明并移出屏幕外。
+        PhonyRootWindow.Opacity = 0;
+        PhonyRootWindow.Position = new PixelPoint(-32000, -32000);
     }
 
 

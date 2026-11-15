@@ -169,6 +169,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
 
     private List<object> TopmostLocks { get; } = [];
 
+    private bool _recipePanelAnimating;
     private double _recipePanelBottom;
     private double _recipePanelMaxHeight;
     private Thickness _recipePanelMargin;
@@ -1737,8 +1738,22 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
             return;
         }
 
+        // 先按内容量出最终高度（此时还没做动画），把窗口一次性撑到目标高度，
+        // 避免展开动画期间每一帧都去改窗口尺寸——那会留下残影/黑块。
         var transitions = RecipeMainOverlay.Transitions;
         RecipeMainOverlay.Transitions = null;
+        RecipeMainOverlay.MaxHeight = double.PositiveInfinity;
+        if (RecipeMainOverlay.Child is Control content)
+        {
+            content.Measure(new Size(Math.Max(1, RecipeMainOverlay.Width), double.PositiveInfinity));
+        }
+
+        var measured = RecipeMainOverlay.Child?.DesiredSize.Height ?? 0;
+        var targetHeight = measured > 0 ? Math.Min(measured, _recipePanelMaxHeight) : _recipePanelMaxHeight;
+        _recipePanelBottom = _recipePanelMargin.Top + targetHeight;
+        _recipePanelAnimating = true;
+        UpdateWindowPos();
+
         RecipeMainOverlay.MaxHeight = 0;
         RecipeMainOverlay.Opacity = 0;
         RecipeMainOverlay.Transitions = transitions;
@@ -1754,11 +1769,22 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
             RecipeMainOverlay.MaxHeight = _recipePanelMaxHeight;
             RecipeMainOverlay.Opacity = 1;
         }, DispatcherPriority.Render);
+
+        DispatcherTimer.RunOnce(() =>
+        {
+            _recipePanelAnimating = false;
+            // 动画结束后再按真实高度校正一次窗口高度。
+            if (RecipeService.IsVisible && RecipeMainOverlay != null && RecipeMainOverlay.Bounds.Height > 0)
+            {
+                _recipePanelBottom = _recipePanelMargin.Top + RecipeMainOverlay.Bounds.Height;
+                UpdateWindowPos();
+            }
+        }, TimeSpan.FromMilliseconds(320));
     }
 
     private void RecipeMainOverlay_OnSizeChanged(object? sender, SizeChangedEventArgs e)
     {
-        if (!RecipeService.IsVisible || RecipeMainOverlay == null || RecipeMainOverlay.Bounds.Height <= 0)
+        if (_recipePanelAnimating || !RecipeService.IsVisible || RecipeMainOverlay == null || RecipeMainOverlay.Bounds.Height <= 0)
         {
             return;
         }
