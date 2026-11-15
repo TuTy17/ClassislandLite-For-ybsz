@@ -169,7 +169,8 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
 
     private List<object> TopmostLocks { get; } = [];
 
-    private double _recipePanelExtraHeight;
+    private double _recipePanelBottom;
+    private double _recipePanelMaxHeight;
     private Thickness _recipePanelMargin;
     private IDisposable? _recipeCollapseTimer;
 
@@ -929,7 +930,11 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         if (LayoutContainerGrid != null)
         {
             LayoutContainerGrid.Width = Width = screen.Bounds.Width / dpiX;
-            LayoutContainerGrid.Height = Height = StackPanelRootContainer.Bounds.Height + safeT + safeB + _recipePanelExtraHeight;
+            var contentHeight = StackPanelRootContainer.Bounds.Height + safeT + safeB;
+            // 食谱面板打开时，窗口高度精确贴合面板底部，避免下方多出一段空白。
+            LayoutContainerGrid.Height = Height = _recipePanelBottom > 0
+                ? Math.Max(contentHeight, _recipePanelBottom + 12)
+                : contentHeight;
         }
         ViewModel.ActualRootOffsetX = 0;
         ViewModel.ActualRootOffsetY = 0;
@@ -1692,20 +1697,35 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
 
     private void ShowRecipePanel()
     {
-        RecipeService.IsFullscreenForeground = ViewModel.IsForegroundFullscreen;
+        var fullscreen = ViewModel.IsForegroundFullscreen;
+        RecipeService.IsFullscreenForeground = fullscreen;
         var availableWidth = Bounds.Width > 100 ? Bounds.Width - 96 : 1080;
-        var minimumWidth = RecipeService.IsFullscreenForeground ? 620 : 460;
+        var minimumWidth = fullscreen ? 620 : 460;
         RecipeMainOverlay.Width = Math.Clamp(GetRecipePanelTargetWidth(), minimumWidth, Math.Max(minimumWidth, Math.Min(1100, availableWidth)));
-        RecipeMainOverlay.MaxHeight = RecipeService.IsFullscreenForeground
-            ? Math.Max(260, Bounds.Height * 0.42)
-            : 260;
 
-        // 面板与课表条顶部对齐，留出主界面条的高度，保证两者不重叠。
-        var stripHeight = GetMainWindowLineHeight();
-        _recipePanelMargin = new Thickness(0, stripHeight + 6, 0, 0);
+        if (fullscreen)
+        {
+            // 前台全屏：不额外弹窗，直接占用课表条的位置，空间不够时在面板内滚动。
+            RootLayoutTransformControl.IsVisible = false;
+            _recipePanelMargin = new Thickness(0, 6, 0, 0);
+            _recipePanelMaxHeight = Math.Max(220, Bounds.Height * 0.42);
+        }
+        else
+        {
+            RootLayoutTransformControl.IsVisible = true;
+            var stripHeight = GetMainWindowLineHeight();
+            _recipePanelMargin = new Thickness(0, stripHeight + 6, 0, 0);
+            _recipePanelMaxHeight = 300;
+        }
+
         RecipeMainOverlay.Margin = _recipePanelMargin;
-        RecipeMainOverlay.IsVisible = true;
+
+        var transitions = RecipeMainOverlay.Transitions;
+        RecipeMainOverlay.Transitions = null;
+        RecipeMainOverlay.MaxHeight = 0;
         RecipeMainOverlay.Opacity = 0;
+        RecipeMainOverlay.IsVisible = true;
+        RecipeMainOverlay.Transitions = transitions;
 
         Dispatcher.UIThread.Post(ExpandRecipePanel, DispatcherPriority.Loaded);
     }
@@ -1719,18 +1739,11 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
 
         var transitions = RecipeMainOverlay.Transitions;
         RecipeMainOverlay.Transitions = null;
-        RecipeMainOverlay.Height = double.NaN;
-        RecipeMainOverlay.Measure(new Size(Math.Max(1, RecipeMainOverlay.Width), double.PositiveInfinity));
-        var measured = RecipeMainOverlay.DesiredSize.Height;
-        var targetHeight = Math.Clamp(measured, 48, RecipeMainOverlay.MaxHeight);
-        RecipeMainOverlay.Height = 0;
+        RecipeMainOverlay.MaxHeight = 0;
+        RecipeMainOverlay.Opacity = 0;
         RecipeMainOverlay.Transitions = transitions;
 
-        // 面板位于主界面窗口内的独立图层，窗口需要显式让出这段空间（课表条本身的高度已经算在内）。
-        _recipePanelExtraHeight = Math.Max(0, _recipePanelMargin.Top + targetHeight - GetMainWindowLineHeight());
-        UpdateWindowPos();
-
-        // 高度与透明度都带过渡，先落到 0，再在下一帧改到目标值，形成连贯的展开动画。
+        // MaxHeight 从 0 过渡到上限，面板高度本身随文本自适应，不会出现多余留白。
         Dispatcher.UIThread.Post(() =>
         {
             if (!RecipeService.IsVisible)
@@ -1738,9 +1751,27 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
                 return;
             }
 
-            RecipeMainOverlay.Height = targetHeight;
+            RecipeMainOverlay.MaxHeight = _recipePanelMaxHeight;
             RecipeMainOverlay.Opacity = 1;
         }, DispatcherPriority.Render);
+    }
+
+    private void RecipeMainOverlay_OnSizeChanged(object? sender, SizeChangedEventArgs e)
+    {
+        if (!RecipeService.IsVisible || RecipeMainOverlay == null || RecipeMainOverlay.Bounds.Height <= 0)
+        {
+            return;
+        }
+
+        // 窗口高度精确贴合面板底部，底部不再留出空白。
+        var panelBottom = _recipePanelMargin.Top + RecipeMainOverlay.Bounds.Height;
+        if (Math.Abs(panelBottom - _recipePanelBottom) < 0.5)
+        {
+            return;
+        }
+
+        _recipePanelBottom = panelBottom;
+        UpdateWindowPos();
     }
 
     private void HideRecipePanel()
@@ -1750,7 +1781,12 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
             return;
         }
 
+        var transitions = RecipeMainOverlay.Transitions;
+        RecipeMainOverlay.Transitions = null;
         RecipeMainOverlay.Opacity = 0;
+        RecipeMainOverlay.Transitions = transitions;
+        RecipeMainOverlay.MaxHeight = 0;
+
         _recipeCollapseTimer?.Dispose();
         _recipeCollapseTimer = DispatcherTimer.RunOnce(() =>
         {
@@ -1760,10 +1796,10 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
             }
 
             RecipeMainOverlay.IsVisible = false;
-            RecipeMainOverlay.Height = 0;
-            _recipePanelExtraHeight = 0;
+            RootLayoutTransformControl.IsVisible = true;
+            _recipePanelBottom = 0;
             UpdateWindowPos();
-        }, TimeSpan.FromMilliseconds(200));
+        }, TimeSpan.FromMilliseconds(220));
     }
 
     private double GetRecipePanelTargetWidth()
