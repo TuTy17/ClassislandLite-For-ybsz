@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Platform;
 using ClassIsland.Platforms.Abstraction.Enums;
 using ClassIsland.Platforms.Abstraction.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ClassIsland.Platforms.Abstraction.Services;
 
@@ -103,4 +105,16 @@ public interface IWindowPlatformService
     /// </summary>
     /// <param name="topLevel">要重绘的窗口</param>
     public void ClearWindow(TopLevel topLevel);
+
+    /// <summary>
+    /// 请求读取当前用户 Toast 通知的权限。
+    /// </summary>
+    public Task<PlatformNotificationAccessResult> RequestNotificationAccessAsync() =>
+        Task.FromResult(new PlatformNotificationAccessResult(false, "当前平台不支持通知镜像"));
+
+    /// <summary>
+    /// 读取当前用户的 Toast 通知。
+    /// </summary>
+    public Task<IReadOnlyList<PlatformToastNotification>> GetToastNotificationsAsync() =>
+        Task.FromResult<IReadOnlyList<PlatformToastNotification>>([]);
 }

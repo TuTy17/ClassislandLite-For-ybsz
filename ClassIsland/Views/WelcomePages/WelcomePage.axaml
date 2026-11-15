@@ -31,30 +31,38 @@
                    Margin="0 0 0 8"
                    Source="/Assets/AppLogo.png"
                    Height="80" Width="80"/>
-            <StackPanel Grid.Row="1" Orientation="Horizontal"
-                        x:Name="TextsMain"
-                        Opacity="0"
+            <StackPanel Grid.Row="1"
                         VerticalAlignment="Center" HorizontalAlignment="Center"
-                        TextElement.FontSize="32">
-                <StackPanel.Styles>
-                    <Style Selector="StackPanel" >
-                        <Style Selector="^ TextBlock">
-                            <Setter Property="FontWeight" Value="Medium"/>
-                            <Setter Property="TextAlignment" Value="Center"/>
+                        Spacing="6">
+                <StackPanel Orientation="Horizontal"
+                            x:Name="TextsMain"
+                            Opacity="0"
+                            HorizontalAlignment="Center"
+                            TextElement.FontSize="32">
+                    <StackPanel.Styles>
+                        <Style Selector="StackPanel" >
+                            <Style Selector="^ TextBlock">
+                                <Setter Property="FontWeight" Value="Medium"/>
+                                <Setter Property="TextAlignment" Value="Center"/>
+                            </Style>
                         </Style>
-                    </Style>
-                </StackPanel.Styles>
-                <TextBlock Text="C" />
-                <TextBlock Text="l" />
-                <TextBlock Text="a" />
-                <TextBlock Text="s" />
-                <TextBlock Text="s" />
-                <TextBlock Text="I" />
-                <TextBlock Text="s" />
-                <TextBlock Text="l" />
-                <TextBlock Text="a" />
-                <TextBlock Text="n" />
-                <TextBlock Text="d" />
+                    </StackPanel.Styles>
+                    <TextBlock Text="C" />
+                    <TextBlock Text="l" />
+                    <TextBlock Text="a" />
+                    <TextBlock Text="s" />
+                    <TextBlock Text="s" />
+                    <TextBlock Text="i" />
+                    <TextBlock Text="s" />
+                    <TextBlock Text="l" />
+                    <TextBlock Text="a" />
+                    <TextBlock Text="n" />
+                    <TextBlock Text="d" />
+                </StackPanel>
+                <TextBlock Text="Lite by Yu" FontSize="18" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" Opacity="0.9"/>
+                <TextBlock Text="由黄燕煜维护开发，基于开源项目 ClassIsland"
+                           FontSize="14" HorizontalAlignment="Center" Opacity="0.68"/>
             </StackPanel>
 
             <StackPanel Grid.Row="2" Spacing="4" VerticalAlignment="Top" HorizontalAlignment="Center">

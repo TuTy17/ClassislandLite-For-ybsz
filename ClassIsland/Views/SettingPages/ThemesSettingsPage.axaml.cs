@@ -42,16 +42,6 @@ public partial class ThemesSettingsPage : SettingsPageBase
 
         InitializeComponent();
         DataContext = this;
-        ViewModel.PluginMarketService.ObservableForProperty(x => x.Exception)
-            .Subscribe(_ =>
-            {
-                if (ViewModel.PluginMarketService.Exception == null)
-                {
-                    return;
-                }
-
-                this.ShowErrorToast("无法刷新市场", ViewModel.PluginMarketService.Exception);
-            });
 
     }
 
@@ -103,9 +93,9 @@ public partial class ThemesSettingsPage : SettingsPageBase
         ViewModel.XamlThemeService.RequestDownloadTheme(id);
     }
 
-    private async void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+    private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
     {
-        await ViewModel.PluginMarketService.RefreshPluginSourceAsync();
+        ViewModel.XamlThemeService.LoadThemeSource();
         ViewModel.UpdateMergedThemes();
     }
     
@@ -140,7 +130,7 @@ public partial class ThemesSettingsPage : SettingsPageBase
                 SuggestedFileName = info.Manifest.Id + ".zip",
                 Title = "打包主题",
                 FileTypeChoices = [
-                    new FilePickerFileType("ClassIsland 主题包")
+                    new FilePickerFileType("Classisland Lite by Yu 主题包")
                     {
                         Patterns = ["*.zip"]
                     }

@@ -85,7 +85,7 @@ public static class Program
             Environment.SetEnvironmentVariable("QT_SCALE_FACTORS", null);
         }
 
-        var mutex = new Mutex(true, "Global\\ClassIsland.Lock", out var createNew);
+        var mutex = new Mutex(true, "Global\\ClassIslandLite.Lock", out var createNew);
 
         if (!createNew)
         {
@@ -108,14 +108,8 @@ public static class Program
                 }
             }
         }
-
-        var sentryEnabled = GlobalStorageService.GetValue("IsSentryEnabled") is "1" or null;
-        if (sentryEnabled )
-        {
-            SentrySdk.Init(ConfigureSentry);
-        }
         try {
-            if (Environment.GetEnvironmentVariable("ClassIsland_ProcessPriority") is { } priorityStr && uint.TryParse(priorityStr, out uint priority))
+            if (Environment.GetEnvironmentVariable("ClassislandLite_ProcessPriority") is { } priorityStr && uint.TryParse(priorityStr, out uint priority))
             {
                 SetProcessPriority(priority);
             }
@@ -134,7 +128,7 @@ public static class Program
         {
             Mutex = mutex,
             IsMutexCreateNew = createNew,
-            IsSentryEnabled = sentryEnabled
+
         };
     }
     
@@ -156,43 +150,6 @@ public static class Program
         {
             // ignored
         }
-    }
-    
-    /// <summary>
-    /// 配置 Sentry SDK 的运行时选项。
-    /// 在启用 Sentry 时由 <see cref="AppEntry"/> 调用以初始化全局监控参数。
-    /// </summary>
-    private static void ConfigureSentry(SentryOptions options)
-    {
-        // A Sentry Data Source Name (DSN) is required.
-        // See https://docs.sentry.io/product/sentry-basics/dsn-explainer/
-        // You can set it in the SENTRY_DSN environment variable, or you can set it in code here.
-        options.Dsn = "https://16f66314173eb09592b08a5ee80f7352@todayeatsentry.classisland.tech:21815/2";
-        // When debug is enabled, the Sentry client will emit detailed debugging information to the console.
-        // This might be helpful, or might interfere with the normal operation of your application.
-        // We enable it here for demonstration purposes when first trying Sentry.
-        // You shouldn't do this in your applications unless you're troubleshooting issues with Sentry.
-        options.Debug = App.ApplicationCommand.EnableSentryDebug;
-        // This option is recommended. It enables Sentry's "Release Health" feature.
-        options.AutoSessionTracking = true;
-        options.Release = App.AppVersion;
-        options.SendClientReports = false;
-        // Enabling this option is recommended for client applications only. It ensures all threads use the same global scope.
-        options.IsGlobalModeEnabled = true;
-        // Example sample rate for your transactions: captures 10% of transactions
-        if (App.ApplicationCommand.EnableSentryDebug)
-        {
-            options.TracesSampleRate = 1.0;
-            // options.ProfilesSampleRate = 1.0;
-        }
-        else
-        {
-            options.TracesSampleRate = 0.05;
-            // options.ProfilesSampleRate = 0.016;
-        }
-        options.EnableLogs = false;
-        options.EnableMetrics = true;
-        options.SetBeforeSendLog(log => log.Level < SentryLogLevel.Info || log is { Template: "当前内存使用: {}" } ? null : log);
     }
     
     /// <summary>

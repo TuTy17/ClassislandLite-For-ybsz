@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using ClassIsland.Core;
-using ClassIsland.Services.AppUpdating;
 using ClassIsland.Services.Management;
 using ClassIsland.Services.SpeechService;
 using Microsoft.Extensions.Hosting;
@@ -26,7 +25,6 @@ public class FileFolderService(SettingsService settingsService, ILogger<FileFold
         ManagementService.ManagementConfigureFolderPath,
         CommonDirectories.AppTempFolderPath,
         CommonDirectories.AppCacheFolderPath,
-        UpdateService.UpdateCachePath,
         EdgeTtsService.EdgeTtsCacheFolderPath,
         PluginService.PluginsPkgRootPath,
         PluginService.PluginsRootPath,
@@ -34,7 +32,6 @@ public class FileFolderService(SettingsService settingsService, ILogger<FileFold
         PluginService.PluginsIndexPath,
         Path.Combine(CommonDirectories.AppRootFolderPath, "Backups"),
         CommonDirectories.AppLogFolderPath,
-        AutomationService.AutomationConfigsFolderPath,
         ManagementService.LocalManagementConfigureFolderPath,
         XamlThemeService.ThemesPath,
         XamlThemeService.ThemesPkgRootPath

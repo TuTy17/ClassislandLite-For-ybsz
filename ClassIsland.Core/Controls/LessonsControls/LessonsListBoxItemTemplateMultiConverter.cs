@@ -52,7 +52,7 @@ internal class LessonsListBoxItemTemplateMultiConverter : AvaloniaObject, IMulti
         // [6]: bool             HideFinishedClass
         // [7]: ICollection<...> ValidTimePoints
         // [8]: bool             IsLiveUpdatingEnabled
-        if (values.Count < 8)
+        if (values.Count < 9)
             return BlankDataTemplate;
         if (values[0] is not int timeType ||
             values[1] is not bool isHideDefault ||
@@ -70,6 +70,15 @@ internal class LessonsListBoxItemTemplateMultiConverter : AvaloniaObject, IMulti
 
         var selectedItem = values[2] as TimeLayoutItem;
         var currentItem = values[3] as TimeLayoutItem;
+        var classPlan = values[8] as ClassPlan;
+
+        if (currentItem?.TimeType == 0 &&
+            classPlan?.TimeLayout != null &&
+            ShouldHideGroupContinuation(classPlan, currentItem, selectedItem))
+        {
+            return BlankDataTemplate;
+        }
+
         if (currentItem != selectedItem && selectedItem?.TimeType == 0 && showCurrentTimeLayoutItemOnlyOnClass)
             return BlankDataTemplate;
 
@@ -99,5 +108,56 @@ internal class LessonsListBoxItemTemplateMultiConverter : AvaloniaObject, IMulti
         }
 
         return selectedItem == currentItem ? ExpandedDataTemplate : MinimizedDataTemplate;
+    }
+
+    private static bool ShouldHideGroupContinuation(
+        ClassPlan classPlan,
+        TimeLayoutItem currentItem,
+        TimeLayoutItem? selectedItem)
+    {
+        var classItems = classPlan.TimeLayout.Layouts
+            .Where(item => item.TimeType == 0)
+            .ToList();
+        var currentIndex = classItems.IndexOf(currentItem);
+        if (currentIndex < 0 || currentIndex >= classPlan.Classes.Count)
+        {
+            return false;
+        }
+
+        var subjectId = classPlan.Classes[currentIndex].SubjectId;
+        if (!classPlan.Classes[currentIndex].IsEnabled || subjectId == Guid.Empty)
+        {
+            return false;
+        }
+
+        var groupStart = currentIndex;
+        var groupEnd = currentIndex;
+        while (groupStart > 0 && IsSameGroup(classPlan.Classes[groupStart - 1], subjectId))
+        {
+            groupStart--;
+        }
+        while (groupEnd + 1 < classPlan.Classes.Count &&
+               IsSameGroup(classPlan.Classes[groupEnd + 1], subjectId))
+        {
+            groupEnd++;
+        }
+
+        if (groupStart == groupEnd)
+        {
+            return false;
+        }
+
+        var selectedIndex = selectedItem == null ? -1 : classItems.IndexOf(selectedItem);
+        var displayIndex = selectedIndex >= groupStart && selectedIndex <= groupEnd
+            ? selectedIndex
+            : groupStart;
+        return currentIndex != displayIndex;
+    }
+
+    private static bool IsSameGroup(ClassInfo classInfo, Guid subjectId)
+    {
+        return classInfo.IsEnabled &&
+               classInfo.SubjectId != Guid.Empty &&
+               classInfo.SubjectId == subjectId;
     }
 }

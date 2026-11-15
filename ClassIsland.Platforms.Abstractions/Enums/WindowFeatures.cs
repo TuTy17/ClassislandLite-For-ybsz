@@ -34,4 +34,9 @@ public enum WindowFeatures
     /// 跳过窗口管理器
     /// </summary>
     SkipManagement = 32,
+
+    /// <summary>
+    /// 指针点击穿透；与 Transparent 分离，允许透明窗口按交互区域决定是否接收输入。
+    /// </summary>
+    ClickThrough = 64,
 }

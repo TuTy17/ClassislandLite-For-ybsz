@@ -13,6 +13,15 @@ namespace ClassIsland.Core.Controls.LessonsControls;
 
 public abstract class LessonControlBase : UserControl
 {
+    public static readonly StyledProperty<string> GroupRemainingTextProperty =
+        AvaloniaProperty.Register<LessonControlBase, string>(nameof(GroupRemainingText), "");
+
+    public string GroupRemainingText
+    {
+        get => GetValue(GroupRemainingTextProperty);
+        set => SetValue(GroupRemainingTextProperty, value);
+    }
+
     public static readonly StyledProperty<ClassInfo> ClassInfoProperty = AvaloniaProperty.Register<LessonControlBase, ClassInfo>(
         nameof(ClassInfo), new ClassInfo());
     
@@ -62,6 +71,7 @@ public abstract class LessonControlBase : UserControl
 
     private void UpdateClassInfo()
     {
+        GroupRemainingText = "";
         var classPlan = GetClassPlan(this);
         if (classPlan == null || CurrentTimeLayoutItem == null || classPlan.TimeLayout == null)
         {
@@ -74,6 +84,7 @@ public abstract class LessonControlBase : UserControl
         }
 
         ClassInfo = classPlan.Classes[subjectIndex];
+        UpdateGroupRemainingText(classPlan, subjectIndex);
         return;
 
         int GetSubjectIndex(int index)
@@ -85,5 +96,43 @@ public abstract class LessonControlBase : UserControl
             var i = l.IndexOf(k);
             return i;
         }
+    }
+
+    private void UpdateGroupRemainingText(ClassPlan classPlan, int subjectIndex)
+    {
+        if (subjectIndex < 0 ||
+            subjectIndex >= classPlan.Classes.Count ||
+            classPlan.Classes[subjectIndex].SubjectId == Guid.Empty)
+        {
+            return;
+        }
+
+        var groupStart = subjectIndex;
+        var groupEnd = subjectIndex;
+        var subjectId = classPlan.Classes[subjectIndex].SubjectId;
+
+        while (groupStart > 0 && IsSameGroup(classPlan.Classes[groupStart - 1], subjectId))
+        {
+            groupStart--;
+        }
+
+        while (groupEnd + 1 < classPlan.Classes.Count &&
+               IsSameGroup(classPlan.Classes[groupEnd + 1], subjectId))
+        {
+            groupEnd++;
+        }
+
+        var remaining = groupEnd - subjectIndex + 1;
+        if (remaining > 1)
+        {
+            GroupRemainingText = $"×{remaining}";
+        }
+    }
+
+    private static bool IsSameGroup(ClassInfo classInfo, Guid subjectId)
+    {
+        return classInfo.IsEnabled &&
+               classInfo.SubjectId != Guid.Empty &&
+               classInfo.SubjectId == subjectId;
     }
 }

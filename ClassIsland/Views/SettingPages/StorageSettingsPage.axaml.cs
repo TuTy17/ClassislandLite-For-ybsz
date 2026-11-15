@@ -1,7 +1,10 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Windows;
+using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using ClassIsland.Core;
 using ClassIsland.Core.Abstractions.Controls;
 using ClassIsland.Core.Abstractions.Services.Management;
@@ -11,6 +14,7 @@ using ClassIsland.Core.Helpers.UI;
 using ClassIsland.Models;
 using ClassIsland.Services;
 using ClassIsland.Shared;
+using ClassIsland.Platforms.Abstraction;
 using ClassIsland.ViewModels.SettingsPages;
 using Microsoft.Extensions.Logging;
 using Path = System.IO.Path;
@@ -70,6 +74,77 @@ public partial class StorageSettingsPage : SettingsPageBase
         }
     }
 
+    private async void ButtonExportConfig_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var root = TopLevel.GetTopLevel(this);
+            if (root == null)
+            {
+                return;
+            }
+            var path = await PlatformServices.FilePickerService.SaveFilePickerAsync(new FilePickerSaveOptions
+            {
+                SuggestedFileName = $"ClassislandLite-Config-{DateTime.Now:yyyyMMdd}.json",
+                DefaultExtension = ".json",
+                FileTypeChoices =
+                [
+                    new FilePickerFileType("Classisland Lite 配置")
+                    {
+                        Patterns = ["*.json"]
+                    }
+                ]
+            }, root);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+
+            SettingsTransferService.Export(ViewModel.SettingsService.Settings, path);
+            this.ShowSuccessToast($"配置已导出到 {path}");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "导出配置失败。");
+            this.ShowErrorToast("导出配置失败", exception);
+        }
+    }
+
+    private async void ButtonImportConfig_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var root = TopLevel.GetTopLevel(this);
+            if (root == null)
+            {
+                return;
+            }
+            var paths = await PlatformServices.FilePickerService.OpenFilesPickerAsync(new FilePickerOpenOptions
+            {
+                AllowMultiple = false,
+                FileTypeFilter =
+                [
+                    new FilePickerFileType("Classisland Lite 配置")
+                    {
+                        Patterns = ["*.json"]
+                    }
+                ]
+            }, root);
+            var path = paths.FirstOrDefault();
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+
+            var count = SettingsTransferService.Import(ViewModel.SettingsService.Settings, path);
+            this.ShowSuccessToast($"已导入 {count} 项配置，重启应用后生效。");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "导入配置失败。");
+            this.ShowErrorToast("导入配置失败", exception);
+        }
+    }
     private async void ButtonRecoverBackup_OnClick(object sender, RoutedEventArgs e)
     {
         if (!await ViewModel.ManagementService.AuthorizeByLevel(ViewModel.ManagementService.CredentialConfig.ExitApplicationAuthorizeLevel))

@@ -13,14 +13,12 @@
             <!-- 定期翻新 -->
             <controls:SettingsExpander IconSource="{ci:FluentIconSource &#xE0B9;}" 
                                         Header="定期翻新"
-                                        Description="当在长时间未启动 ClassIsland 的寒假/暑假等学期结束后的长假后启动 ClassIsland 时，显示桌面通知询问是否重新设置应用的部分设置以适应新学期。">
+                                        Description="当在长时间未启动 Classisland Lite by Yu 的寒假/暑假等学期结束后的长假后启动应用时，显示桌面通知询问是否重新设置应用的部分设置以适应新学期。">
                 <controls:SettingsExpander.Styles>
                     <Style Selector="controls|SettingsExpanderItem.new-cfg">
                         <Setter Property="Description" Value="将创建并切换到一个全新的配置文件。"/>
                     </Style>
-                    <Style Selector="controls|SettingsExpanderItem.disable-plugins">
-                        <Setter Property="Description" Value="将禁用已经启用的插件。"/>
-                    </Style>
+
                 </controls:SettingsExpander.Styles>
                 <controls:SettingsExpander.Footer>
                     <ToggleSwitch IsChecked="{Binding ViewModel.SettingsService.Settings.IsRefreshingToastEnabled, Mode=TwoWay}"/>
@@ -46,12 +44,8 @@
                 <controls:SettingsExpanderItem Classes.new-cfg="{Binding ViewModel.SettingsService.Settings.RefreshingScopes.Components}">
                     <CheckBox Content="组件配置" IsChecked="{Binding ViewModel.SettingsService.Settings.RefreshingScopes.Components}"/>
                 </controls:SettingsExpanderItem>
-                <controls:SettingsExpanderItem Classes.new-cfg="{Binding ViewModel.SettingsService.Settings.RefreshingScopes.Automations}">
-                    <CheckBox Content="自动化" IsChecked="{Binding ViewModel.SettingsService.Settings.RefreshingScopes.Automations}"/>
-                </controls:SettingsExpanderItem>
-                <controls:SettingsExpanderItem Classes.disable-plugins="{Binding ViewModel.SettingsService.Settings.RefreshingScopes.Plugins}">
-                    <CheckBox Content="插件" IsChecked="{Binding ViewModel.SettingsService.Settings.RefreshingScopes.Plugins}"/>
-                </controls:SettingsExpanderItem>
+
+
                 <controls:SettingsExpanderItem Content="立即翻新" ActionIconSource="{ci:FluentIconSource &#xE44E;}"
                                                IsClickEnabled="True"
                                                Click="SettingsExpanderItemRefreshNow_OnClick"/>
@@ -61,7 +55,7 @@
             <controls:SettingsExpander Header="迎新模式"
                                        IconSource="{ci:FluentIconSource &#xE95D;}"
                                        IsExpanded="{Binding ViewModel.SettingsService.Settings.RefreshingToastIsOnboardingGuide, Mode=OneWay}"
-                                       Description="启用后，在下次显示翻新提示时将其替换为迎新指引，指引不熟悉 ClassIsland 的新同学上手本应用，并对应用进行翻新。此选项在生效一次后将自动关闭。">
+                                       Description="启用后，在下次显示翻新提示时将其替换为迎新指引，指引不熟悉 Classisland Lite by Yu 的新同学上手本应用，并对应用进行翻新。此选项在生效一次后将自动关闭。">
                 <controls:SettingsExpander.Footer>
                     <ToggleSwitch IsChecked="{Binding ViewModel.SettingsService.Settings.RefreshingToastIsOnboardingGuide, Mode=TwoWay}"/>
                 </controls:SettingsExpander.Footer>
@@ -92,7 +86,7 @@
             <controls:SettingsExpander IconSource="{ci:FluentIconSource &#xE3F8;}" 
                                        Header="通知显示间隔"
                                        IsExpanded="True"
-                                       Description="设置在不启动 ClassIsland 多少天后显示翻新或迎新指引。">
+                                       Description="设置在不启动 Classisland Lite by Yu 多少天后显示翻新或迎新指引。">
                 <controls:SettingsExpander.Footer>
                     <ci:Field VerticalAlignment="Center"
                               Suffix="天">

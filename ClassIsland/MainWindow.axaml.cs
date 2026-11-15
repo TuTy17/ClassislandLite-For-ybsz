@@ -151,6 +151,8 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
     public TopmostEffectWindow TopmostEffectWindow { get; }
     
     public IXamlThemeService XamlThemeService { get; }
+    public RecipeService RecipeService { get; }
+    public QqNotificationMirrorService QqNotificationMirrorService { get; }
     private ITutorialService TutorialService { get; }
 
     public event EventHandler<MousePosChangedEventArgs>? MousePosChanged;
@@ -209,7 +211,9 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         IManagementService managementService,
         TopmostEffectWindow topmostEffectWindow,
         IXamlThemeService xamlThemeService,
-        ITutorialService tutorialService)
+        ITutorialService tutorialService,
+        RecipeService recipeService,
+        QqNotificationMirrorService qqNotificationMirrorService)
     {
         Logger = logger;
         SpeechService = speechService;
@@ -228,6 +232,8 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         TopmostEffectWindow = topmostEffectWindow;
         XamlThemeService = xamlThemeService;
         TutorialService = tutorialService;
+        RecipeService = recipeService;
+        QqNotificationMirrorService = qqNotificationMirrorService;
         
         ViewModel = new MainViewModel();
         DataContext = this;
@@ -803,6 +809,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
     }
 
     
+
     internal Screen? GetSelectedScreenSafe()
     {
         return ViewModel.Settings.WindowDockingMonitorIndex < Screens.ScreenCount 
@@ -836,7 +843,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
             Settings.IsScreenRecordingModeEnabled: false
         };
         PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.ToolWindow, shouldUseToolWindow);
-        PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.Transparent, !ViewModel.IsEditMode);
+        PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.Transparent | WindowFeatures.ClickThrough, !ViewModel.IsEditMode);
         PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.Private, isCaptureBlocked);
     }
 
@@ -913,7 +920,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         if (LayoutContainerGrid != null)
         {
             LayoutContainerGrid.Width = Width = screen.Bounds.Width / dpiX;
-            LayoutContainerGrid.Height = Height = RootLayoutTransformControl.Bounds.Height + safeT + safeB;
+            LayoutContainerGrid.Height = Height = StackPanelRootContainer.Bounds.Height + safeT + safeB;
         }
         ViewModel.ActualRootOffsetX = 0;
         ViewModel.ActualRootOffsetY = 0;
@@ -1149,10 +1156,6 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         ViewModel.Settings.IsWelcomeWindowShowed = false;
     }
 
-    private void MenuItemHelps_OnClick(object sender, EventArgs e)
-    {
-        UriNavigationService.Navigate(new Uri("https://docs.classisland.tech/app/"));
-    }
 
     private void MenuItemUpdates_OnClick(object sender, EventArgs e)
     {
@@ -1647,6 +1650,11 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
     private void TeachingTipEditModeP4_OnCloseButtonClick(TeachingTip sender, EventArgs args)
     {
         ViewModel.Settings.HasEditModeTutorialShown = true;
+    }
+
+    private void ButtonCloseInlineRecipe_OnClick(object? sender, RoutedEventArgs e)
+    {
+        RecipeService.Dismiss();
     }
     #endregion
 }

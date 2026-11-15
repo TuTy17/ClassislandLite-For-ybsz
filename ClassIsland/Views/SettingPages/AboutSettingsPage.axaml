@@ -1,4 +1,4 @@
-﻿<controls:SettingsPageBase x:Class="ClassIsland.Views.SettingPages.AboutSettingsPage"
+<controls:SettingsPageBase x:Class="ClassIsland.Views.SettingPages.AboutSettingsPage"
       xmlns="https://github.com/avaloniaui"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -177,7 +177,7 @@
                 <Border Margin="12 16 18 0"
                         MaxWidth="{StaticResource SettingsContainerWidth}">
                     <TextBlock FontWeight="Normal"
-                               Text="关于 ClassIsland"
+                               Text="关于 Classisland Lite by Yu"
                                VerticalAlignment="Bottom"
                                Theme="{StaticResource TitleTextBlockStyle}"
                                Margin="0 8"/>
@@ -185,7 +185,7 @@
             </Grid>
         </controls1:StickyScrollViewer.HeaderContent>
         <StackPanel Classes="settings-container ">
-            <controls3:SettingsExpander Header="ClassIsland"
+            <controls3:SettingsExpander Header="Classisland Lite by Yu"
                                         IsExpanded="True">
                 <controls3:SettingsExpander.Footer>
                     <TextBlock Text="{x:Static local:AboutSettingsPage.DisplayVersion}"
@@ -195,7 +195,7 @@
                 <controls3:SettingsExpander.IconSource>
                     <controls3:ImageIconSource Source="/Assets/AppLogo.png"/>
                 </controls3:SettingsExpander.IconSource>
-                <controls3:SettingsExpanderItem Description="本项目基于 GNU General Public License v3.0 获得许可。">
+                <controls3:SettingsExpanderItem Description="Classisland Lite by Yu 由 Yu 维护，基于 ClassIsland 开源项目修改，并遵循 GNU General Public License v3.0。">
                     <controls3:SettingsExpanderItem.Footer>
                         <WrapPanel Classes="animated-resize">
                             <WrapPanel.Styles>
@@ -205,13 +205,10 @@
                                 </Style>
                             </WrapPanel.Styles>
                             <HyperlinkButton Click="SettingsExpanderItemShowOssLicense_OnClick"
-                                             CommandParameter="https://classisland.tech">
+                                             CommandParameter="https://github.com/ClassIsland/ClassIsland">
                                 <TextBlock Text="开放源代码许可"/>
                             </HyperlinkButton>
-                            <HyperlinkButton Click="ButtonPrivacy_OnClick"
-                                             CommandParameter="https://docs.classisland.tech">
-                                <TextBlock Text="隐私政策"/>
-                            </HyperlinkButton>
+
                         </WrapPanel>
                     </controls3:SettingsExpanderItem.Footer>
                     <TextBlock Background="Transparent" >
@@ -228,21 +225,15 @@
                                 </Style>
                             </WrapPanel.Styles>
                             <HyperlinkButton Click="UriNavigationCommands_OnClick"
-                                             CommandParameter="https://classisland.tech">
+                                             CommandParameter="https://github.com/ClassIsland/ClassIsland">
                                 <TextBlock Text="项目主页"/>
                             </HyperlinkButton>
-                            <HyperlinkButton Click="UriNavigationCommands_OnClick"
-                                             CommandParameter="https://docs.classisland.tech">
-                                <TextBlock Text="帮助文档"/>
-                            </HyperlinkButton>
+
                             <HyperlinkButton Click="UriNavigationCommands_OnClick"
                                              CommandParameter="https://github.com/ClassIsland/ClassIsland">
                                 <TextBlock Text="GitHub"/>
                             </HyperlinkButton>
-                            <HyperlinkButton Click="UriNavigationCommands_OnClick"
-                                             CommandParameter="https://docs.classisland.tech/community/">
-                                <TextBlock Text="加入社区"/>
-                            </HyperlinkButton>
+
                         </WrapPanel>
                     </controls3:SettingsExpanderItem.Footer>
                 </controls3:SettingsExpanderItem>

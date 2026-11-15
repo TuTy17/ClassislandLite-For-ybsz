@@ -1,0 +1,111 @@
+<controls:SettingsPageBase x:Class="ClassIsland.Views.SettingPages.ExperimentalSettingsPage"
+                           xmlns="https://github.com/avaloniaui"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:controls="clr-namespace:ClassIsland.Core.Abstractions.Controls;assembly=ClassIsland.Core"
+                           xmlns:ui="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+                           xmlns:ci="http://classisland.tech/schemas/xaml/core"
+                           x:ClassModifier="public">
+    <ScrollViewer>
+        <StackPanel Classes="settings-container animated-intro" Margin="12">
+            <TextBlock Text="这里的功能会改变主界面的显示方式。关闭开关后可恢复原有显示。"
+                       Classes="l-instructive" Margin="0,0,0,12" />
+
+            <ui:SettingsExpander Header="狂欢模式"
+                                 Description="把所有课程预览显示为“语文”，课表数据本身不会被修改。"
+                                 IconSource="{ci:FluentIconSource &#xE8D2;}">
+                <ui:SettingsExpander.Footer>
+                    <ToggleSwitch IsChecked="{Binding ViewModel.SettingsService.Settings.IsCarnivalModeEnabled, Mode=TwoWay}" />
+                </ui:SettingsExpander.Footer>
+            </ui:SettingsExpander>
+
+            <ui:SettingsExpander Header="娱乐模式"
+                                 Description="主界面只显示自定义文案，隐藏课表和其他组件。"
+                                 IconSource="{ci:FluentIconSource &#xE7F4;}">
+                <ui:SettingsExpander.Footer>
+                    <ToggleSwitch IsChecked="{Binding ViewModel.SettingsService.Settings.IsEntertainmentModeEnabled, Mode=TwoWay}" />
+                </ui:SettingsExpander.Footer>
+                <ui:SettingsExpanderItem Content="自定义文案">
+                    <ui:SettingsExpanderItem.Footer>
+                        <TextBox Width="320"
+                                 Text="{Binding ViewModel.SettingsService.Settings.EntertainmentModeText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
+            </ui:SettingsExpander>
+
+            <ui:SettingsExpander Header="食谱预览"
+                                 Description="读取 Excel 菜单，在指定课程下课后显示当天午餐或晚餐。"
+                                 IsExpanded="True"
+                                 IconSource="{ci:FluentIconSource &#xE8D1;}">
+                <ui:SettingsExpander.Footer>
+                    <ToggleSwitch IsChecked="{Binding ViewModel.SettingsService.Settings.IsRecipePreviewEnabled, Mode=TwoWay}" />
+                </ui:SettingsExpander.Footer>
+                <ui:SettingsExpanderItem Content="菜单 Excel 文件">
+                    <ui:SettingsExpanderItem.Footer>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock MaxWidth="300"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="{Binding ViewModel.SettingsService.Settings.RecipeWorkbookPath}" />
+                            <Button Content="导入…" Click="ButtonImportRecipe_OnClick" />
+                        </StackPanel>
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="识别状态">
+                    <TextBlock Text="{Binding ViewModel.RecipeService.StatusText}" TextWrapping="Wrap" />
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="午餐显示课程">
+                    <ui:SettingsExpanderItem.Footer>
+                        <ComboBox Width="380"
+                                  ItemsSource="{Binding ViewModel.RecipeLessonChoices}"
+                                  SelectedValueBinding="{Binding Key}"
+                                  SelectedValue="{Binding ViewModel.SettingsService.Settings.RecipeLunchTriggerLessonKey, Mode=TwoWay}" />
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="晚餐显示课程">
+                    <ui:SettingsExpanderItem.Footer>
+                        <ComboBox Width="380"
+                                  ItemsSource="{Binding ViewModel.RecipeLessonChoices}"
+                                  SelectedValueBinding="{Binding Key}"
+                                  SelectedValue="{Binding ViewModel.SettingsService.Settings.RecipeDinnerTriggerLessonKey, Mode=TwoWay}" />
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="下课后延迟弹出（秒）">
+                    <ui:SettingsExpanderItem.Footer>
+                        <NumericUpDown Width="140" Minimum="0" Maximum="120"
+                                       Value="{Binding ViewModel.SettingsService.Settings.RecipeShowDelaySeconds, Mode=TwoWay}" />
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="下节课前提前收回（秒）">
+                    <ui:SettingsExpanderItem.Footer>
+                        <NumericUpDown Width="140" Minimum="0" Maximum="300"
+                                       Value="{Binding ViewModel.SettingsService.Settings.RecipeHideBeforeClassSeconds, Mode=TwoWay}" />
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="预览">
+                    <ui:SettingsExpanderItem.Footer>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Content="预览午餐" Click="ButtonPreviewLunch_OnClick" />
+                            <Button Content="预览晚餐" Click="ButtonPreviewDinner_OnClick" />
+                        </StackPanel>
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
+            </ui:SettingsExpander>
+
+            <ui:SettingsExpander Header="QQ 消息镜像"
+                                 Description="尝试读取 QQ 的 Windows 消息通知，并在主界面原尺寸内显示文字 3 秒。消息内容取决于 QQ 和 Windows 实际提供的通知文本。"
+                                 IconSource="{ci:FluentIconSource &#xE8BD;}">
+                <ui:SettingsExpander.Footer>
+                    <ToggleSwitch IsChecked="{Binding ViewModel.SettingsService.Settings.IsQqNotificationMirrorEnabled, Mode=TwoWay}" />
+                </ui:SettingsExpander.Footer>
+                <ui:SettingsExpanderItem Content="连接状态">
+                    <TextBlock Text="{Binding ViewModel.QqNotificationMirrorService.StatusText}"
+                               TextWrapping="Wrap" />
+                </ui:SettingsExpanderItem>
+            </ui:SettingsExpander>
+
+            <ui:InfoBar IsOpen="True" Severity="Informational"
+                        Title="课程分组"
+                        Message="连续且相同的课程会自动合并为一项，乘以的数字表示从当前课程起还剩几节。" />
+        </StackPanel>
+    </ScrollViewer>
+</controls:SettingsPageBase>

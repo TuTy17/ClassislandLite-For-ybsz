@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +34,7 @@ public class TaskBarIconService : IHostedService, ITaskBarIconService
     } = new()
     {
         Icon = new WindowIcon(OperatingSystem.IsMacOS() ? "../Resources/Assets/AppLogo_Monochrome.png" : "Assets/AppLogo.png"),
-        ToolTipText = "ClassIsland"
+        ToolTipText = "Classisland Lite by Yu"
     };
 
     public IList<NativeMenuItemBase> MoreOptionsMenuItems => MoreOptionsMenu!.Items;

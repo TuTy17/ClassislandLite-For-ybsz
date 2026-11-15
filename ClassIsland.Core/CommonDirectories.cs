@@ -19,7 +19,7 @@ public static class CommonDirectories
     /// 全局数据目录
     /// </summary>
     public static string AppDataFolderPath =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ClassIsland");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ClassislandLite");
 
     /// <summary>
     /// 应用日志目录

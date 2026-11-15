@@ -132,4 +132,5 @@ public partial class NotificationSettingsViewModel : ObservableRecipient
     }
 
     public bool HasValidMainWindowLine => ComponentsService.CurrentComponents.Lines.Any(x => x.IsNotificationEnabled);
+
 }

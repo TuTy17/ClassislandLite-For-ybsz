@@ -13,7 +13,7 @@ public static class GlobalStorageService
     private static bool _isInitialized = false;
     private static ObservableDictionary<string, string> _storage = new();
     private static readonly string GlobalStoragePath =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ClassIsland", "Global",
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ClassIslandLite", "Global",
             "Global.json");
 
     /// <summary>

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using System.Linq;
+using System.Collections.Specialized;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
@@ -19,6 +20,7 @@ using ClassIsland.Models.ComponentSettings;
 using ClassIsland.Shared.Abstraction.Models;
 using ClassIsland.Shared.Enums;
 using ClassIsland.Shared.Models.Profile;
+using ClassIsland.Shared.ComponentModels;
 using ReactiveUI;
 
 namespace ClassIsland.Controls.Components;
@@ -28,7 +30,7 @@ namespace ClassIsland.Controls.Components;
 /// </summary>
 [MigrateFrom("E7831603-61A0-4180-B51B-54AD75B1A4D3")]  // 课程表（旧）
 [ComponentInfo("1DB2017D-E374-4BC6-9D57-0B4ADF03A6B8", "课程表", "\ue751", "显示当前的课程表信息。")]
-[PseudoClasses(":show-tomorrow-schedule", ":show-tomorrow-schedule-after-school", ":show-tomorrow-schedule-on-empty", ":show-tomorrow-schedule-always")]
+[PseudoClasses(":show-tomorrow-schedule", ":show-tomorrow-schedule-after-school", ":show-tomorrow-schedule-on-empty", ":show-tomorrow-schedule-always", ":show-tomorrow-schedule-at-last-class")]
 public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, INotifyPropertyChanged
 {
     private bool _hideFinishedClass;
@@ -54,6 +56,8 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
     }
     
     private bool _showCurrentLessonOnlyOnClass = false;
+    private bool _showCurrentLessonOnlyFromSettings;
+    private bool _isLastLessonPeriod;
     private bool _isAfterSchool = false;
     private ClassPlan? _tomorrowClassPlan;
     private ClassPlan? _tomorrowClassPlan1;
@@ -70,6 +74,20 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
     private IDisposable? _tomorrowScheduleShowModeObserver;
     private IDisposable? _hideFinishedClassObserver;
     private IDisposable? _showEmptyPlaceholderObserver;
+    private IDisposable? _carnivalModeObserver;
+    private ObservableDictionary<Guid, Subject> _displaySubjects = new();
+
+    private static readonly Subject CarnivalSubject = new()
+    {
+        Name = "语文",
+        Initial = "语"
+    };
+
+    public ObservableDictionary<Guid, Subject> DisplaySubjects
+    {
+        get => _displaySubjects;
+        private set => SetField(ref _displaySubjects, value);
+    }
     public int LessonsListBoxSelectedIndex
     {
         get => GetValue(LessonsListBoxSelectedIndexProperty);
@@ -125,6 +143,7 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
         DetachedFromVisualTree += (_, _) => LessonsService.PropertyChanged -= LessonsServiceOnPropertyChanged;
         DetachedFromVisualTree += OnDetachedFromVisualTree;
         InitializeComponent();
+        RefreshDisplaySubjects();
         CurrentTimeStateChanged();
     }
 
@@ -137,6 +156,9 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
         _tomorrowScheduleShowModeObserver = null;
         _hideFinishedClassObserver = null;
         _showEmptyPlaceholderObserver = null;
+        _carnivalModeObserver?.Dispose();
+        _carnivalModeObserver = null;
+        ProfileService.Profile.Subjects.CollectionChanged -= ProfileSubjectsOnCollectionChanged;
     }
 
     private void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs visualTreeAttachmentEventArgs)
@@ -156,6 +178,12 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
         _showEmptyPlaceholderObserver ??= Settings
             .ObservableForProperty(x => x.ShowPlaceholderOnEmptyClassPlan)
             .Subscribe(_ => ShowEmptyPlaceholder = Settings.ShowPlaceholderOnEmptyClassPlan);
+        _carnivalModeObserver ??= SettingsService.Settings
+            .ObservableForProperty(x => x.IsCarnivalModeEnabled)
+            .Subscribe(_ => RefreshDisplaySubjects());
+        ProfileService.Profile.Subjects.CollectionChanged -= ProfileSubjectsOnCollectionChanged;
+        ProfileService.Profile.Subjects.CollectionChanged += ProfileSubjectsOnCollectionChanged;
+        RefreshDisplaySubjects();
 
         HideFinishedClass = Settings.HideFinishedClass;
         ShowEmptyPlaceholder = Settings.ShowPlaceholderOnEmptyClassPlan;
@@ -165,9 +193,10 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
 
     private void CheckTomorrowClassShowMode()
     {
-        PseudoClasses.Set(":show-tomorrow-schedule", Settings.TomorrowScheduleShowMode is 1 or 2 or 3);
-        PseudoClasses.Set(":show-tomorrow-schedule-after-school", Settings.TomorrowScheduleShowMode is 1);
+        PseudoClasses.Set(":show-tomorrow-schedule", Settings.TomorrowScheduleShowMode is 1 or 2 or 3 or 4);
+        PseudoClasses.Set(":show-tomorrow-schedule-after-school", Settings.TomorrowScheduleShowMode is 1 or 4);
         PseudoClasses.Set(":show-tomorrow-schedule-always", Settings.TomorrowScheduleShowMode is 2);
+        UpdateLastLessonState();
         UpdateTomorrowVisibility();
     }
 
@@ -212,10 +241,46 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
                 LessonsService.CurrentClassPlan,
                 LessonsService.CurrentClassPlan?.TimeLayout) ??
             Settings;
-        ShowCurrentLessonOnlyOnClass = settingsSource.ShowCurrentLessonOnlyOnClass;
+        _showCurrentLessonOnlyFromSettings = settingsSource.ShowCurrentLessonOnlyOnClass;
         TomorrowClassPlan = LessonsService.GetClassPlanByDate(ExactTimeService.GetCurrentLocalDateTime() + TimeSpan.FromDays(1));
+        UpdateLastLessonState();
         MainLessonsListBox.SelectedIndex = LessonsListBoxSelectedIndex;
         UpdateTomorrowVisibility();
+    }
+
+    private void ProfileSubjectsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        RefreshDisplaySubjects();
+    }
+
+    private void RefreshDisplaySubjects()
+    {
+        var subjects = new ObservableDictionary<Guid, Subject>();
+        foreach (var (id, subject) in ProfileService.Profile.Subjects)
+        {
+            subjects[id] = SettingsService.Settings.IsCarnivalModeEnabled
+                ? CarnivalSubject
+                : subject;
+        }
+
+        DisplaySubjects = subjects;
+    }
+
+    private void UpdateLastLessonState()
+    {
+        var currentPlan = LessonsService.CurrentClassPlan;
+        var lastLesson = currentPlan?.ValidTimeLayoutItems?
+            .Where(item => item.TimeType == 0 && !item.IsHideDefault)
+            .LastOrDefault();
+        var now = ExactTimeService.GetCurrentLocalDateTime();
+
+        _isLastLessonPeriod = Settings.TomorrowScheduleShowMode == 4
+                              && lastLesson != null
+                              && now.TimeOfDay >= lastLesson.StartTime
+                              && now.TimeOfDay <= lastLesson.EndTime;
+
+        ShowCurrentLessonOnlyOnClass = _showCurrentLessonOnlyFromSettings || _isLastLessonPeriod;
+        PseudoClasses.Set(":show-tomorrow-schedule-at-last-class", _isLastLessonPeriod);
     }
 
     private void UpdateTomorrowVisibility()

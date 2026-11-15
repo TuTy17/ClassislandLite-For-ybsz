@@ -1,4 +1,4 @@
-﻿<ci:SettingsPageBase x:Class="ClassIsland.Views.SettingPages.StorageSettingsPage"
+<ci:SettingsPageBase x:Class="ClassIsland.Views.SettingPages.StorageSettingsPage"
       xmlns="https://github.com/avaloniaui"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -15,7 +15,7 @@
     <ScrollViewer>
         <StackPanel Classes="settings-container animated-intro">
             <controls:InfoBar Severity="Warning"
-                              Message="ClassIsland 部分配置文件已损坏且无法加载，这些配置文件已恢复至默认值。"
+                              Message="Classisland Lite by Yu 部分配置文件已损坏且无法加载，这些配置文件已恢复至默认值。"
                               IsVisible="{Binding !!Count, Source={x:Static helpers:ConfigureFileHelper.Errors}}">
                 <controls:InfoBar.ActionButton>
                     <Button Theme="{StaticResource TransparentButton}" HorizontalAlignment="Left"
@@ -38,7 +38,7 @@
             <!-- 启用自动备份 -->
             <controls:SettingsExpander IconSource="{ci:FluentIconSource &#xEFFF;}"
                                        Header="启用自动备份"
-                                       Description="启用后，ClassIsland 将每隔一段时间自动备份当前的档案和配置文件。"
+                                       Description="启用后，Classisland Lite by Yu 将每隔一段时间自动备份当前的档案和配置文件。"
                                        IsExpanded="{Binding ViewModel.SettingsService.Settings.IsAutoBackupEnabled, Mode=OneWay}">
                 <controls:SettingsExpander.Footer>
                     <ToggleSwitch IsChecked="{Binding ViewModel.SettingsService.Settings.IsAutoBackupEnabled, Mode=TwoWay}"/>
@@ -103,7 +103,19 @@
                                                IsClickEnabled="True" ActionIconSource="{ci:FluentIconSource &#xEC2D;}"
                                                IsEnabled="{Binding !ViewModel.IsBackingUp}"/>
                 <controls:SettingsExpanderItem Content="备份文件占用大小"
-                                               Footer="{Binding ViewModel.SettingsService.Settings.BackupFilesSize}"/>
+                                               Footer="{Binding ViewModel.SettingsService.Settings.BackupFilesSize}"/>            </controls:SettingsExpander>
+
+            <controls:SettingsExpander IconSource="{ci:FluentIconSource &#xE8B7;}"
+                                       Header="配置迁移"
+                                       Description="导出设备无关的提醒、外观、隐藏行为与组件布局配置；窗口位置、显示器、字体、输入和硬件相关设置不会导出。">
+                <controls:SettingsExpanderItem Content="导出配置到文件…"
+                                               Click="ButtonExportConfig_OnClick"
+                                               IsClickEnabled="True"
+                                               ActionIconSource="{ci:FluentIconSource &#xE74E;}"/>
+                <controls:SettingsExpanderItem Content="从文件导入配置…"
+                                               Click="ButtonImportConfig_OnClick"
+                                               IsClickEnabled="True"
+                                               ActionIconSource="{ci:FluentIconSource &#xE8E5;}"/>
             </controls:SettingsExpander>
             
         </StackPanel>

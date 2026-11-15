@@ -56,6 +56,22 @@
             </Style>
         </Style>
         
+        <Style Selector="local|ScheduleComponent:show-tomorrow-schedule-at-last-class:not(.TomorrowScheduleEmpty)">
+            <Style Selector="^ Border#Tomorrow">
+                <Setter Property="IsVisible" Value="True"/>
+            </Style>
+            <Style Selector="^ ci|LessonsListBox#MainLessonsListBox">
+                <Setter Property="IsVisible" Value="True"/>
+                <Setter Property="ClassPlan" Value="{Binding LessonsService.CurrentClassPlan, Mode=OneWay, RelativeSource={RelativeSource AncestorType=local:ScheduleComponent}}"/>
+            </Style>
+            <Style Selector="^ ci|LessonsListBox#TomorrowLessonsListBox">
+                <Setter Property="IsVisible" Value="True"/>
+                <Setter Property="ClassPlan" Value="{Binding TomorrowClassPlan, Mode=OneWay, RelativeSource={RelativeSource AncestorType=local:ScheduleComponent}}"/>
+            </Style>
+            <Style Selector="^ TextBlock#EmptyPlaceholder">
+                <Setter Property="IsVisible" Value="False"/>
+            </Style>
+        </Style>
         <Style Selector="local|ScheduleComponent:show-tomorrow-schedule:not(.TomorrowScheduleEmpty)">
             <Style Selector="^:show-tomorrow-schedule-on-empty, ^:show-tomorrow-schedule-after-school.AfterSchool, ^:show-tomorrow-schedule-always">
                 <Style Selector="^ Border#Tomorrow">
@@ -75,10 +91,10 @@
             </Style>
         </Style>
     </ci:ComponentBase.Styles>
-    <Grid ColumnDefinitions="Auto,*" DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:ScheduleComponent}}">
+    <Grid ColumnDefinitions="Auto,Auto,*" DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:ScheduleComponent}}">
         <Border 
-            Grid.Column="0"
-            Margin="0 0 2 0"
+            Grid.Column="1"
+            Margin="8 0 8 0"
             VerticalAlignment="Center"
             Background="{DynamicResource AccentFillColorDefaultBrush}"
             Padding="8 2"
@@ -87,8 +103,8 @@
             <TextBlock Text="明天" Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
                        Margin="0,1,0,-1"/>
         </Border>
-        <ci:LessonsListBox Grid.Column="1" 
-                           Subjects="{Binding ProfileService.Profile.Subjects, Mode=OneWay}"
+        <ci:LessonsListBox Grid.Column="0" 
+                           Subjects="{Binding DisplaySubjects, Mode=OneWay}"
                            LessonControlSettings="{Binding Settings, Mode=OneWay}"
                            ShowCurrentTimeLayoutItemOnlyOnClass="{Binding ShowCurrentLessonOnlyOnClass, Mode=OneWay}"
                            HighlightChangedClass="{Binding Settings.HighlightChangedClass, Mode=OneWay}"
@@ -96,13 +112,14 @@
                            x:Name="MainLessonsListBox"
                            FadeCompletedClasses="{Binding Settings.FadeCompletedClasses, Mode=OneWay, RelativeSource={RelativeSource AncestorType=local:ScheduleComponent}}"
                            IsLiveUpdatingEnabled="True"/>
-        <ci:LessonsListBox Grid.Column="1" 
-                           Subjects="{Binding ProfileService.Profile.Subjects, Mode=OneWay}"
+        <ci:LessonsListBox Grid.Column="2" 
+                           Margin="2 0 0 0"
+                           Subjects="{Binding DisplaySubjects, Mode=OneWay}"
                            LessonControlSettings="{Binding Settings, Mode=OneWay}"
                            IsLiveUpdatingEnabled="False"
                            HighlightChangedClass="{Binding Settings.HighlightChangedClass, Mode=OneWay}"
                            x:Name="TomorrowLessonsListBox"/>
-        <Grid Grid.Column="0" Grid.ColumnSpan="2">
+        <Grid Grid.Column="0" Grid.ColumnSpan="3">
             <TextBlock VerticalAlignment="Center" x:Name="EmptyPlaceholder"/>
         </Grid>
         <!-- <StackPanel Grid.Column="1"> -->

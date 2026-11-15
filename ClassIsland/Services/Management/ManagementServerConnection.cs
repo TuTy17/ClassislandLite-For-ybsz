@@ -142,8 +142,7 @@ public class ManagementServerConnection : IManagementServerConnection
             ConfigTypes.Profile => JsonSerializer.Serialize(IAppHost.GetService<IProfileService>().Profile),
             ConfigTypes.CurrentComponent => JsonSerializer.Serialize(IAppHost.GetService<IComponentsService>()
                 .CurrentComponents),
-            ConfigTypes.CurrentAutomation => JsonSerializer.Serialize(IAppHost.GetService<IAutomationService>()
-                .Workflows),
+
             ConfigTypes.Logs => JsonSerializer.Serialize(IAppHost.GetService<AppLogService>().Logs),
             ConfigTypes.PluginList => JsonSerializer.Serialize(IPluginService.LoadedPlugins
                 .Where(x => x.LoadStatus == PluginLoadStatus.Loaded)

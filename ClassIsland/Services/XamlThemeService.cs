@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -35,7 +35,6 @@ public class XamlThemeService : ObservableRecipient, IXamlThemeService
     private static readonly FieldInfo? s_stylesAppliedField = typeof(StyledElement).GetField("_stylesApplied", BindingFlags.Instance | BindingFlags.NonPublic);
     
     public ILogger<XamlThemeService> Logger { get; }
-    public IPluginMarketService PluginMarketService { get; }
     public SettingsService SettingsService { get; }
     private IComponentsService ComponentsService { get; }
     private Styles RootStyles { get; set; } = [];
@@ -70,11 +69,10 @@ public class XamlThemeService : ObservableRecipient, IXamlThemeService
     public double ActualVerticalSafeAreaPx { get; set; } = 0.0;
 
 
-    public XamlThemeService(ILogger<XamlThemeService> logger, IPluginMarketService pluginMarketService,
+    public XamlThemeService(ILogger<XamlThemeService> logger,
         SettingsService settingsService, IComponentsService componentsService)
     {
         Logger = logger;
-        PluginMarketService = pluginMarketService;
         SettingsService = settingsService;
         ComponentsService = componentsService;
         EnabledThemes = ConfigureFileHelper.LoadConfig<ObservableCollection<string>>(EnabledThemesPath);
@@ -157,7 +155,6 @@ public class XamlThemeService : ObservableRecipient, IXamlThemeService
     {
         Logger.LogInformation("正在加载主题源");
         LoadLocalThemes();
-        PluginMarketService.LoadPluginSource();
         var merged = new ObservableDictionary<string, ThemeInfo>();
         Indexes.Clear();
         
@@ -166,55 +163,6 @@ public class XamlThemeService : ObservableRecipient, IXamlThemeService
             var id = themeLocal.Manifest.Id;
             merged[id] = themeLocal;
         }
-
-
-        var indexInfos = PluginMarketService.GetIndexInfos().ToList();
-        foreach (var i in indexInfos)
-        {
-            var indexFolderPath = Path.Combine(Services.PluginService.PluginsIndexPath, i.Id);
-            var name = Path.GetFileName(indexFolderPath);
-            Logger.LogDebug("正在加载主题源：{}", name);
-            var indexPath = Path.Combine(indexFolderPath, "themes.json");
-            if (!File.Exists(indexPath))
-                continue;
-            var index = Indexes[name] = ConfigureFileHelper.LoadConfig<ThemeIndex>(indexPath);
-            var pluginIndex = PluginMarketService.Indexes.GetValueOrDefault(name) ?? new PluginIndex()
-            {
-                DownloadMirrors = Services.PluginMarketService.FallbackMirrors
-            };
-            var mirror = i.SelectedMirror;
-            if (!pluginIndex.DownloadMirrors.TryGetValue(mirror, out var root))
-            {
-                root = pluginIndex.DownloadMirrors.First().Value;
-            }
-            Logger.LogDebug("主题源 {} 选择的镜像根：{}", name, root);
-            foreach (var theme in index.Themes)
-            {
-                var id = theme.Manifest.Id;
-                theme.DownloadUrl = theme.DownloadUrl.Replace("{root}", root);
-                if (merged.ContainsKey(id) && merged[id].IsLocal)
-                {
-                    var themeLocal = merged[id];
-                    themeLocal.IsAvailableOnMarket = true;
-                    themeLocal.DownloadCount = theme.DownloadCount;
-                    themeLocal.StarsCount = theme.StarsCount;
-                    if (Version.TryParse(themeLocal.Manifest.Version, out var versionLocal) &&
-                        Version.TryParse(theme.Manifest.Version, out var versionRemote) &&
-                        versionRemote > versionLocal)
-                    {
-                        themeLocal.IsUpdateAvailable = true;
-                    }
-
-                    merged.Remove(id);
-                    merged[id] = themeLocal;
-                    continue;
-                }
-                theme.IsAvailableOnMarket = true;
-                theme.RealBannerPath = theme.RealBannerPath.Replace("{root}", root);
-                merged[id] = theme;
-            }
-        }
-
         MergedThemes = merged;
         BindDownloadTasks();
     }

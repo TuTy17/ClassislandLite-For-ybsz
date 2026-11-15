@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using Avalonia.Platform;
@@ -15,7 +15,7 @@ public static class ShortcutHelpers
         if (OperatingSystem.IsWindows())
         {
             var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                "ClassIsland.lnk");
+                "Classisland Lite by Yu.lnk");
 
             using var shortcut = new WindowsShortcut();
             shortcut.Path = AppBase.ExecutingEntrance;
@@ -25,7 +25,7 @@ public static class ShortcutHelpers
         else if (OperatingSystem.IsLinux())
         {
             var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                "ClassIsland.desktop");
+                "classisland-lite-by-yu.desktop");
 
             await CreateFreedesktopShortcutAsync(desktopPath, false);
             await CopyFreeDesktopIconAsync();
@@ -37,7 +37,7 @@ public static class ShortcutHelpers
         if (OperatingSystem.IsWindows())
         {
             var startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu),
-                "ClassIsland.lnk");
+                "Classisland Lite by Yu.lnk");
 
             using var shortcut = new WindowsShortcut();
             shortcut.Path = AppBase.ExecutingEntrance;

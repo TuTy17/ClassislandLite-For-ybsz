@@ -208,6 +208,7 @@
                                 <ComboBoxItem>放学后显示</ComboBoxItem>
                                 <ComboBoxItem>总是显示</ComboBoxItem>
                                 <ComboBoxItem>无展示课程时显示</ComboBoxItem>
+                                <ComboBoxItem>最后一节课时显示（隐藏此前课程）</ComboBoxItem>
                             </ComboBox>
                         </Grid>
                     </controls:SettingsExpander.Footer>

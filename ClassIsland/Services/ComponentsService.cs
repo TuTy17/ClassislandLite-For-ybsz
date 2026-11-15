@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -41,10 +41,13 @@ public class ComponentsService : ObservableRecipient, IComponentsService
                     new ComponentSettings
                     {
                         Id = "df3f8295-21f6-482e-bada-fa0e5f14bb66"
+                    },                    new ComponentSettings
+                    {
+                        Id = "1db2017d-e374-4bc6-9d57-0b4adf03a6b8"
                     },
                     new ComponentSettings
                     {
-                        Id = "1db2017d-e374-4bc6-9d57-0b4adf03a6b8"
+                        Id = "7e2a9c41-5b3d-4f8e-9a6c-1d2e3f4a5b6c"
                     }
                 }
             }

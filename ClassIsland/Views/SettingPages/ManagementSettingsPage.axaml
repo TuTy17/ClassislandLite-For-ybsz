@@ -1,4 +1,4 @@
-﻿<ci:SettingsPageBase x:Class="ClassIsland.Views.SettingPages.ManagementSettingsPage"
+<ci:SettingsPageBase x:Class="ClassIsland.Views.SettingPages.ManagementSettingsPage"
       xmlns="https://github.com/avaloniaui"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -40,14 +40,7 @@
                         <TextBlock Text="加入管理" />
                     </Grid>
                 </controls1:SettingsExpanderItem>
-                <controls1:SettingsExpanderItem Command="{x:Static ci:UriNavigationCommands.UriNavigationCommand}"
-                                                IsClickEnabled="True"
-                                                ActionIconSource="{ci:FluentIconSource &#xEC2E;}"
-                                                CommandParameter="https://docs.classisland.tech/management/">
-                    <Grid>
-                        <TextBlock Text="了解更多" />
-                    </Grid>
-                </controls1:SettingsExpanderItem>
+
             </StackPanel>
 
             <StackPanel Classes="cardContainer"

@@ -66,6 +66,11 @@
                     <TextBlock VerticalAlignment="Center" FontSize="{DynamicResource MainWindowEmphasizedFontSize}"
                                FontWeight="Bold" Text="{Binding DisplayingSubject.Name, Mode=OneWay}"/>
                 </controls:HighlightBox>
+                <TextBlock Margin="4,0,0,0"
+                           VerticalAlignment="Center"
+                           FontSize="{DynamicResource MainWindowBodyFontSize}"
+                           FontWeight="SemiBold"
+                           Text="{Binding GroupRemainingText, RelativeSource={RelativeSource AncestorType=local:LessonControlExpanded}}" />
             </Grid>
             
             <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">

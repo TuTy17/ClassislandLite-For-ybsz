@@ -146,13 +146,13 @@ public partial class DevPortalWindow : MyWindow
                         new TutorialSentence()
                         {
                             Title = "Hello world!",
-                            Content = "Welcome to ClassIsland!",
+                            Content = "Welcome to Classisland Lite by Yu!",
                             HeroImage = "https://res.classisland.tech/banners/banner-v2.webp"
                         },
                         new TutorialSentence()
                         {
                             Title = "Hello world!",
-                            Content = "Welcome to ClassIsland!",
+                            Content = "Welcome to Classisland Lite by Yu!",
                         }
                     }
                 },
@@ -172,14 +172,14 @@ public partial class DevPortalWindow : MyWindow
                         new TutorialSentence()
                         {
                             Title = "Hello world!",
-                            Content = "Welcome to ClassIsland!",
+                            Content = "Welcome to Classisland Lite by Yu!",
                             HeroImage = "https://res.classisland.tech/banners/banner-v2.webp",
                             TargetSelector = "TabControl.compact TabItem"
                         },
                         new TutorialSentence()
                         {
                             Title = "Hello world!",
-                            Content = "Welcome to ClassIsland!",
+                            Content = "Welcome to Classisland Lite by Yu!",
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Reflection;
 
 #if Platforms_Windows
@@ -15,14 +15,14 @@ using Mono.Unix;
 string executableName;
 if (OperatingSystem.IsWindows())
 {
-    executableName = "ClassIsland.Desktop.exe";
+    executableName = "ClassislandLite.Desktop.exe";
 } else if (OperatingSystem.IsLinux())
 {
-    executableName = "ClassIsland.Desktop";
+    executableName = "ClassislandLite.Desktop";
 }
 else
 {
-    ShowError("ClassIsland 正在不支持的平台上运行，无法继续。");
+    ShowError("Classisland Lite by Yu 正在不支持的平台上运行，无法继续。");
     return 1;
 }
 
@@ -58,7 +58,7 @@ var installation = Directory.GetDirectories(root)
 
 if (installation == null)
 {
-    ShowError("找不到有效的 ClassIsland 版本，可能是安装已损坏。请在 https://classisland.tech/download 重新下载并安装 ClassIsland。");
+    ShowError("找不到有效的 Classisland Lite by Yu 版本，可能是安装已损坏。");
     return 1;
 }
 
@@ -88,7 +88,7 @@ foreach (var i in args)
 {
     startInfo.ArgumentList.Add(i);
 }
-startInfo.EnvironmentVariables["ClassIsland_PackageRoot"] = root;  // 防止因环境变量已设置导致启动器崩溃
+startInfo.EnvironmentVariables["ClassislandLite_PackageRoot"] = root;  // 防止因环境变量已设置导致启动器崩溃
 Process.Start(startInfo);
 
 return 0;
@@ -97,7 +97,7 @@ void ShowError(string message)
 {
 #if Platforms_Windows
     PInvoke.MessageBox(HWND.Null, message,
-        "ClassIsland", MESSAGEBOX_STYLE.MB_APPLMODAL | MESSAGEBOX_STYLE.MB_ICONSTOP);
+        "Classisland Lite by Yu", MESSAGEBOX_STYLE.MB_APPLMODAL | MESSAGEBOX_STYLE.MB_ICONSTOP);
 #else
     Console.Error.WriteLine(message);
 #endif

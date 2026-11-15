@@ -5,12 +5,14 @@
         <Nullable>enable</Nullable>
         <OutputType>Exe</OutputType>
         <BaseFramework>net8.0</BaseFramework>
-        <ApplicationId>cn.classisland.app</ApplicationId>
-        <Company>ClassIsland</Company>
-        <Product>ClassIsland</Product>
+
+        <ApplicationId>cn.huangyanyu.classislandlite</ApplicationId>
+        <AssemblyName>ClassislandLite.Desktop</AssemblyName>
+        <Company>黄燕煜</Company>
+        <Product>Classisland Lite by Yu</Product>
         <SatelliteResourceLanguages>en;zh-cn</SatelliteResourceLanguages>
-        <Title>ClassIsland</Title>
-        <AssemblyTitle>ClassIsland</AssemblyTitle>
+        <Title>Classisland Lite by Yu</Title>
+        <AssemblyTitle>Classisland Lite by Yu</AssemblyTitle>
     </PropertyGroup>
     <PropertyGroup Condition="'$(PublishBuilding)'=='true' And '$(PublishPlatform)'=='macos'">
         <!-- Preserve PublishFolderType from referenced projects for macOS app bundle resources. -->
@@ -22,13 +24,13 @@
     
     <!-- UOS DEB Packaging Properties -->
     <PropertyGroup>
-        <AppId>cn.classisland.app</AppId>
-        <AppName>ClassIsland</AppName>
+        <AppId>cn.huangyanyu.classislandlite</AppId>
+        <AppName>Classisland Lite by Yu</AppName>
         <DebControlDescription>功能强大、可定制、跨平台的大屏课表显示工具。</DebControlDescription>
         <DesktopComment>功能强大、可定制、跨平台的大屏课表显示工具。</DesktopComment>
         <DebControlHomepage>https://classisland.tech</DebControlHomepage>
         <DebControlSection>utils</DebControlSection>
-        <DebControlMaintainer>ClassIsland</DebControlMaintainer>
+        <DebControlMaintainer>黄燕煜</DebControlMaintainer>
         <Png32x32IconFile>Assets\AppLogo@32w.png</Png32x32IconFile>
         <SvgIconFile>Assets\AppLogo.svg</SvgIconFile>
 <!--        <DesktopMimeType>x-scheme-handler/classisland</DesktopMimeType>-->

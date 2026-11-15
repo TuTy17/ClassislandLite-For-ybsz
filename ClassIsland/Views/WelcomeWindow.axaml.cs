@@ -144,9 +144,9 @@ public partial class WelcomeWindow : MyWindow, INavigationPageFactory
     [SupportedOSPlatform("windows")]
     private async Task CreateShortcutsWindows()
     {
-        var startupPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "ClassIsland.lnk");
-        var startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "ClassIsland.lnk");
-        var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "ClassIsland.lnk");
+        var startupPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "Classisland Lite by Yu.lnk");
+        var startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Classisland Lite by Yu.lnk");
+        var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Classisland Lite by Yu.lnk");
         using var shortcut = new WindowsShortcut();
         shortcut.Path = AppBase.ExecutingEntrance;
         shortcut.WorkingDirectory = Path.GetDirectoryName(AppBase.ExecutingEntrance);
@@ -168,7 +168,7 @@ public partial class WelcomeWindow : MyWindow, INavigationPageFactory
             ".config/autostart/cn.classisland.app.desktop");
         var startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
             ".local/share/applications/cn.classisland.app.desktop");
-        var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "ClassIsland.desktop");
+        var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "classisland-lite-by-yu.desktop");
 
         if (ViewModel.CreateStartupShortcut)
             await ShortcutHelpers.CreateFreedesktopShortcutAsync(startupPath);
@@ -227,7 +227,7 @@ public partial class WelcomeWindow : MyWindow, INavigationPageFactory
         e.Cancel = true;
         var r = await new ContentDialog()
         {
-            Title = "退出 ClassIsland",
+            Title = "退出 Classisland Lite by Yu",
             Content = "您需要完成设置才能开始使用本应用。关闭此窗口将直接退出应用。",
             PrimaryButtonText = "退出",
             SecondaryButtonText = "取消",

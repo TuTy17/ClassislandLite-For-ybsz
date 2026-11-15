@@ -1,4 +1,4 @@
-﻿<Window x:Class="ClassIsland.MainWindow"
+<Window x:Class="ClassIsland.MainWindow"
         xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -49,23 +49,13 @@
         <profile:ClassPlan x:Key="FallbackClassPlan"/>
         
         <NativeMenu x:Key="AppMenu">
-            <NativeMenuItem Header="ClassIsland" Click="MenuItemAbout_OnClick">
+            <NativeMenuItem Header="Classisland Lite by Yu" Click="MenuItemAbout_OnClick">
                 <NativeMenuItem.Icon>
                     <OnPlatform Default="Assets/AppLogo.png">
                         <On Content="{x:Null}" Options="macOS"/>
                     </OnPlatform>
                 </NativeMenuItem.Icon>
-            </NativeMenuItem>
-            <NativeMenuItem Header="教学…"
-                            ci:NativeMenuItemAssist.IconSource="{ci:FluentIconSource &#xE959;}"
-                            Click="NativeMenuItemTutorials_OnClick" 
-                            IsVisible="{Binding ViewModel.Settings.IsWelcomeWindowShowed}"/>
-            <NativeMenuItem Header="帮助文档…"
-                            ci:NativeMenuItemAssist.IconSource="{ci:FluentIconSource &#xE23C;}"
-                            Click="MenuItemHelps_OnClick" 
-                            IsVisible="{Binding ViewModel.Settings.IsWelcomeWindowShowed}"/>
-            <NativeMenuItemSeparator/>
-            <NativeMenuItem Header="显示主界面" Click="MenuItemSwitchMainWindowVisibility_OnClick"
+            </NativeMenuItem>            <NativeMenuItem Header="显示主界面" Click="MenuItemSwitchMainWindowVisibility_OnClick"
                             ci:NativeMenuItemAssist.IconSource="{ci:FluentIconSource &#xE813;}">
                 <MenuItem.IsVisible>
                     <MultiBinding Converter="{StaticResource BooleanAndExpressionMultiConverter}" Mode="OneWay">
@@ -97,11 +87,7 @@
                             IsVisible="{Binding !!$self.Menu.Items.Count}"/>
             <NativeMenuItemSeparator/>
             <NativeMenuItem Header="编辑档案…" Click="ButtonSettings_OnClick" 
-                            ci:NativeMenuItemAssist.IconSource="{ci:FluentIconSource &#xE699;}"/>
-            <NativeMenuItem Header="加载临时课表…" Click="MenuItemTemporaryClassPlan_OnClick"
-                            ci:NativeMenuItemAssist.IconSource="{ci:FluentIconSource &#xE6A1;}">
-            </NativeMenuItem>
-            <NativeMenuItem Header="换课…" Click="MenuItemClassSwap_OnClick"
+                            ci:NativeMenuItemAssist.IconSource="{ci:FluentIconSource &#xE699;}"/>            <NativeMenuItem Header="换课…" Click="MenuItemClassSwap_OnClick"
                             ci:NativeMenuItemAssist.IconSource="{ci:FluentIconSource &#xE15F;}">
             </NativeMenuItem>
             <NativeMenuItemSeparator/>
@@ -119,11 +105,8 @@
                             ci:NativeMenuItemAssist.IconSource="{ci:FluentIconSource &#xE2C8;}">
                 <NativeMenu>
                     <NativeMenuItem Header="DevTools" Click="NativeMenuItemDebugDevTools_OnClick"/>
-                    <NativeMenuItem Header="DevPortal" Click="NativeMenuItemDebugDevPortal_OnClick"/>
                     <NativeMenuItem Header="截图工具" Click="NativeMenuItemDebugOpenScreenshotWindow_OnClick"/>
-                    <NativeMenuItem Header="教程编辑器" Click="NativeMenuItemOpenTutorialEditor_OnClick"/>
                     <NativeMenuItemSeparator/>
-                    <NativeMenuItem  Header="启用课表" Click="NativeMenuItemDebugEnableTempClassPlan_OnClick"/>
                     <NativeMenuItem  Header="显示崩溃窗口" Click="NativeMenuItemDebugCrashTest_OnClick"/>
                     <NativeMenuItem  Header="WelcomeWindow" Click="NativeMenuItemDebugOpenWelcomeWindow_OnClick"/>
                     <NativeMenuItem  Header="WelcomeWindow (full)" Click="NativeMenuItemDebugOpenWelcomeWindowFull_OnClick"/>
@@ -172,12 +155,12 @@
             <Setter Property="CanResize" Value="False"/>
             <Setter Property="CanMaximize" Value="False"/>
             <Setter Property="CanMinimize" Value="False"/>
-            <Setter Property="Title" Value="ClassIsland"/>
+            <Setter Property="Title" Value="Classisland Lite by Yu"/>
         </Style>
         <Style Selector=":is(Window):edit-mode">
             <Setter Property="Background" Value="{DynamicResource SmokeFillColorDefaultBrush}"/>
             <Setter Property="TransparencyLevelHint" Value="AcrylicBlur, Transparent"/>
-            <Setter Property="Title" Value="编辑主界面 | ClassIsland"/>
+            <Setter Property="Title" Value="编辑主界面 | Classisland Lite by Yu"/>
         </Style>
         <Style Selector=":is(Window):windowed">
             <Setter Property="SystemDecorations" Value="Full"/>
@@ -209,7 +192,8 @@
                     ShowZoomIndicator="True"
                     EnableGestureRotation="False"
                     TextElement.FontFamily="{Binding ViewModel.Settings.MainWindowFont, Mode=OneWay, Converter={StaticResource StringToFontFamilyConverter}}"
-                    TextElement.FontWeight="{Binding ViewModel.Settings.MainWindowFontWeight2, Converter={StaticResource IntToFontWeightConverter}}">
+                    TextElement.FontWeight="{Binding ViewModel.Settings.MainWindowFontWeight2, Converter={StaticResource IntToFontWeightConverter}}"
+                    IsVisible="{Binding !ViewModel.Settings.IsEntertainmentModeEnabled}">
             <Canvas x:Name="LayoutContainerGrid">
                 <Panel x:Name="WorkingRoot"
                        Canvas.Left="{Binding ViewModel.ActualClientBound.X}"
@@ -218,7 +202,7 @@
                     <Panel.Styles>
                         <Style Selector="Panel#WorkingRoot[(ci|MainWindowStylesAssist.MainWindowInEditMode)=False]">
                             <Setter Property="Width" Value="{Binding ViewModel.ActualClientBound.Width}"/>
-                            <Setter Property="Height" Value="{Binding #RootLayoutTransformControl.Bounds.Height}"/>
+                            <Setter Property="Height" Value="{Binding #StackPanelRootContainer.Bounds.Height}"/>
                         </Style>
                         <Style Selector="Panel#WorkingRoot[(ci|MainWindowStylesAssist.MainWindowInEditMode)=True]">
                             <Setter Property="MinWidth" Value="{Binding ViewModel.ActualClientBound.Width}"/>
@@ -248,7 +232,8 @@
                                 </Style>
                             </StackPanel.Styles>
                             <LayoutTransformControl x:Name="RootLayoutTransformControl"
-                                                    ClipToBounds="False">
+                                                    ClipToBounds="False"
+                                                    IsVisible="{Binding !RecipeService.IsFullscreenVisible}">
                                 <LayoutTransformControl.RenderTransform>
                                     <TranslateTransform X="{Binding ViewModel.ActualRootOffsetX}"
                                                         Y="{Binding ViewModel.ActualRootOffsetY}" />
@@ -586,11 +571,120 @@
 
                                 </Grid>
                             </LayoutTransformControl>
+                            <Border x:Name="RecipeMainOverlay"
+                                    IsVisible="{Binding RecipeService.IsFullscreenVisible}"
+                                    Classes.visible="{Binding RecipeService.IsFullscreenVisible}"
+                                    Margin="6,4"
+                                    Padding="16,10"
+                                    MinHeight="84"
+                                    MaxHeight="200"
+                                    HorizontalAlignment="Stretch"
+                                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="{DynamicResource ControlCornerRadius}"
+                                    RenderTransformOrigin="0.5,0.5">
+                                <Border.Styles>
+                                    <Style Selector="Border#RecipeMainOverlay">
+                                        <Setter Property="Opacity" Value="0"/>
+                                        <Setter Property="RenderTransform" Value="scale(0.97)"/>
+                                    </Style>
+                                    <Style Selector="Border#RecipeMainOverlay.visible">
+                                        <Setter Property="Opacity" Value="1"/>
+                                        <Setter Property="RenderTransform" Value="scale(1)"/>
+                                    </Style>
+                                </Border.Styles>
+                                <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="{Binding RecipeService.Title}"
+                                               FontSize="22"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1"
+                                            Content="×"
+                                            Theme="{StaticResource TransparentButton}"
+                                            Width="34"
+                                            Height="34"
+                                            FontSize="22"
+                                            Click="ButtonCloseInlineRecipe_OnClick"/>
+                                    <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2"
+                                                  Margin="0,6,0,0"
+                                                  MaxHeight="132"
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled">
+                                        <ItemsControl ItemsSource="{Binding RecipeService.ActiveSections}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <WrapPanel Orientation="Horizontal"/>
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Border MinWidth="220"
+                                                            MaxWidth="440"
+                                                            Margin="0,0,8,8"
+                                                            Padding="12,8"
+                                                            CornerRadius="8"
+                                                            Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
+                                                            BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
+                                                            BorderThickness="1">
+                                                        <StackPanel Spacing="4">
+                                                            <TextBlock Text="{Binding Name}"
+                                                                       FontSize="15"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
+                                                            <TextBlock Text="{Binding ItemsText}"
+                                                                       FontSize="20"
+                                                                       LineHeight="28"
+                                                                       TextWrapping="Wrap"/>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
                         </StackPanel>
                     </VisualLayerManager>
                 </Panel>
             </Canvas>
         </ZoomBorder>
+
+        <Border x:Name="EntertainmentModeOverlay"
+                IsVisible="{Binding ViewModel.Settings.IsEntertainmentModeEnabled}"
+                Background="#FF101113"
+                ZIndex="1000">
+            <TextBlock Text="{Binding ViewModel.Settings.EntertainmentModeText}"
+                       Foreground="White"
+                       FontFamily="{Binding ViewModel.Settings.MainWindowFont, Converter={StaticResource StringToFontFamilyConverter}}"
+                       FontSize="{DynamicResource MainWindowLargeFontSize}"
+                       FontWeight="SemiBold"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="32" />
+        </Border>
+
+        <Border IsVisible="{Binding QqNotificationMirrorService.IsMessageVisible}"
+                Background="#F2181A1F"
+                BorderBrush="#44FFFFFF"
+                BorderThickness="1"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Margin="1"
+                CornerRadius="8"
+                ZIndex="950">
+            <TextBlock Text="{Binding QqNotificationMirrorService.CurrentMessage}"
+                       Foreground="White"
+                       FontSize="{DynamicResource MainWindowBodyFontSize}"
+                       FontWeight="SemiBold"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Stretch"
+                       VerticalAlignment="Center"
+                       Margin="14,4" />
+        </Border>
         
         <Border HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0 0 0 64"
                 IsVisible="{Binding ViewModel.IsEditMode}"

@@ -15,7 +15,7 @@
         <TextBlock Text="外观" HorizontalAlignment="Center"
                    Margin="0 0 0 4"
                    Theme="{StaticResource SubtitleTextBlockStyle}"/>
-        <TextBlock Text="调整 ClassIsland 主界面的外观。" HorizontalAlignment="Center"
+        <TextBlock Text="调整 Classisland Lite by Yu 主界面的外观。" HorizontalAlignment="Center"
                    Margin="0 0 0 8"/>
         
         <controls:SettingsExpander IconSource="{ci:FluentIconSource &#xF4D1;}"

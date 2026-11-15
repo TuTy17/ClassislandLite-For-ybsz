@@ -33,6 +33,7 @@ using GptSoVitsSpeechSettingsList = ObservableCollection<GptSoVitsSpeechSettings
 /// NotificationSettingsPage.xaml 的交互逻辑
 /// </summary>
 [FullWidthPage]
+[Group("classisland.reminders")]
 [SettingsPageInfo("notification", "提醒", "\ue02b", "\ue02a", SettingsPageCategory.Internal)]
 public partial class NotificationSettingsPage : SettingsPageBase
 {

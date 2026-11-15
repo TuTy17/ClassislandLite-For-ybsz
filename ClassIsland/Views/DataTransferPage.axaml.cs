@@ -260,7 +260,7 @@ public partial class DataTransferPage : UserControl
         ViewModel.PerformImportAction = BeginPerformClassIsland2Import;
         ViewModel.PageIndex = 1;
         ViewModel.ImportSourcePath = "";
-        ViewModel.ImportDescription = "支持从 ClassIsland 2.x 数据文件导入课表、组件配置、自动化配置、应用设置、部分插件和主题等数据。";
+        ViewModel.ImportDescription = "支持从 Classisland Lite by Yu 数据文件导入课表、组件配置、自动化配置、应用设置、部分插件和主题等数据。";
         ViewModel.IsExport = false;
     }
     
@@ -275,8 +275,8 @@ public partial class DataTransferPage : UserControl
         PopupHelper.DisableAllPopups();
         var file = await PlatformServices.FilePickerService.OpenFilesPickerAsync(new FilePickerOpenOptions()
         {
-            Title = "浏览 ClassIsland 2 导出文件",
-            FileTypeFilter = [ new FilePickerFileType("ClassIsland 数据文件")
+            Title = "浏览 Classisland Lite by Yu 导出文件",
+            FileTypeFilter = [ new FilePickerFileType("Classisland Lite by Yu 数据文件")
                 {
                     Patterns = ["*.cidata"]
                 } 
@@ -416,7 +416,7 @@ public partial class DataTransferPage : UserControl
         ViewModel.PerformImportAction = PerformClassIsland2ExportAction;
         ViewModel.PageIndex = 1;
         ViewModel.ImportSourcePath = "";
-        ViewModel.ImportDescription = "支持导出为可以导入到其它 ClassIsland 2 实例的文件格式。";
+        ViewModel.ImportDescription = "支持导出为可以导入到其它 Classisland Lite by Yu 实例的文件格式。";
         ViewModel.IsExport = true;
     }
 
@@ -433,12 +433,12 @@ public partial class DataTransferPage : UserControl
         var file = await PlatformServices.FilePickerService.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "浏览保存的导出文件",
-            FileTypeChoices = [ new FilePickerFileType("ClassIsland 数据文件")
+            FileTypeChoices = [ new FilePickerFileType("Classisland Lite by Yu 数据文件")
                 {
                     Patterns = ["*.cidata"]
                 } 
             ],
-            SuggestedFileName = $"ClassIsland_data_{AppBase.AppVersion}_{DateTime.Now:yyyyMMdd_HHmmss}.cidata"
+            SuggestedFileName = $"ClassislandLite_data_{AppBase.AppVersion}_{DateTime.Now:yyyyMMdd_HHmmss}.cidata"
         }, topLevel);
         PopupHelper.RestoreAllPopups();
         
@@ -783,10 +783,9 @@ public partial class DataTransferPage : UserControl
             await PlatformServices.DesktopToastService.ShowToastAsync(new DesktopToastContent()
             {
                 Title = "正在升级插件",
-                Body = "正在升级从 ClassIsland 1 导入的插件到兼容 ClassIsland 2 的版本，这可能需要一定的时间，应用将在升级完成后显示一条通知。部分插件可能暂不支持 ClassIsland 2。"
+                Body = "正在升级从旧版 ClassIsland 1 导入的插件到兼容当前版本的版本，这可能需要一定的时间，应用将在升级完成后显示一条通知。部分插件可能暂不支持 ClassIsland 2。"
             });
-            await IAppHost.GetService<IPluginMarketService>().RefreshPluginSourceAsync();
-            IAppHost.GetService<IPluginMarketService>().UpdateAllPlugins(true);
+
         }
     }
 

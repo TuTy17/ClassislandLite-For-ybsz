@@ -9,6 +9,8 @@ using ClassIsland.Core.Controls;
 using ClassIsland.Platforms.Abstraction.Enums;
 using ClassIsland.Platforms.Abstraction.Models;
 using ClassIsland.Platforms.Abstraction.Services;
+using Windows.UI.Notifications;
+using Windows.UI.Notifications.Management;
 
 namespace ClassIsland.Platform.Windows.Services;
 
@@ -133,7 +135,8 @@ public class WindowPlatformService : IWindowPlatformService, IDisposable
             var style = GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
             if (state)
             {
-                style |= (int)WINDOW_EX_STYLE.WS_EX_LAYERED | (int)WINDOW_EX_STYLE.WS_EX_TRANSPARENT | (int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE;
+                style |= (int)WINDOW_EX_STYLE.WS_EX_LAYERED | (int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE;
+                style &= ~(int)WINDOW_EX_STYLE.WS_EX_TRANSPARENT;
                 SetLayeredWindowAttributes(hwnd, new COLORREF(0), 255, (LAYERED_WINDOW_ATTRIBUTES_FLAGS)0x2);
             }
             else
@@ -142,11 +145,25 @@ public class WindowPlatformService : IWindowPlatformService, IDisposable
                 style &= ~(int)WINDOW_EX_STYLE.WS_EX_LAYERED;
                 style &= ~(int)WINDOW_EX_STYLE.WS_EX_NOACTIVATE;
             }
-            var r = SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, style);
+            SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, style);
             if (state && GetForegroundWindow() == handle)
             {
                 MoveFocusToWindowBehind(hwnd);
             }
+        }
+        if ((features & WindowFeatures.ClickThrough) > 0)
+        {
+            var hwnd = (HWND)handle;
+            var style = GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+            if (state)
+            {
+                style |= (int)WINDOW_EX_STYLE.WS_EX_TRANSPARENT;
+            }
+            else
+            {
+                style &= ~(int)WINDOW_EX_STYLE.WS_EX_TRANSPARENT;
+            }
+            SetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, style);
         }
         if ((features & WindowFeatures.Bottommost) > 0)
         {
@@ -328,5 +345,32 @@ public class WindowPlatformService : IWindowPlatformService, IDisposable
     public void ClearWindow(TopLevel topLevel)
     {
         
+    }
+
+    public async Task<PlatformNotificationAccessResult> RequestNotificationAccessAsync()
+    {
+        var access = await UserNotificationListener.Current.RequestAccessAsync();
+        return access == UserNotificationListenerAccessStatus.Allowed
+            ? new PlatformNotificationAccessResult(true, "Windows 通知读取权限已允许")
+            : new PlatformNotificationAccessResult(false, access == UserNotificationListenerAccessStatus.Denied
+                ? "Windows 拒绝了通知读取权限"
+                : "尚未获得 Windows 通知读取权限");
+    }
+
+    public async Task<IReadOnlyList<PlatformToastNotification>> GetToastNotificationsAsync()
+    {
+        var notifications = await UserNotificationListener.Current.GetNotificationsAsync(NotificationKinds.Toast);
+        return notifications.Select(notification => new PlatformToastNotification(
+                notification.Id,
+                notification.CreationTime,
+                notification.AppInfo?.AppUserModelId ?? "",
+                notification.AppInfo?.DisplayInfo?.DisplayName ?? "",
+                notification.Notification?.Visual?
+                    .GetBinding(KnownNotificationBindings.ToastGeneric)?
+                    .GetTextElements()?
+                    .Select(text => text.Text ?? "")
+                    .Where(text => !string.IsNullOrWhiteSpace(text))
+                    .ToArray() ?? []))
+            .ToArray();
     }
 }

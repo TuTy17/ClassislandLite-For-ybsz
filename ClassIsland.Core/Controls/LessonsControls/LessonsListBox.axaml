@@ -90,6 +90,7 @@
                                     <Binding Path="$parent[lessonsControls:LessonsListBox].ShowCurrentTimeLayoutItemOnlyOnClass" Mode="OneWay"/>
                                     <Binding Path="$parent[lessonsControls:LessonsListBox].HideFinishedClass" Mode="OneWay"/>
                                     <Binding Path="$parent[lessonsControls:LessonsListBox].ClassPlan.ValidTimeLayoutItems" Mode="OneWay"/>
+                                    <Binding Path="$parent[lessonsControls:LessonsListBox].ClassPlan" RelativeSource="{RelativeSource AncestorType=lessonsControls:LessonsListBox}" Mode="OneWay"/>
                                 </MultiBinding>
                             </ContentPresenter.ContentTemplate>
                         </ContentPresenter>

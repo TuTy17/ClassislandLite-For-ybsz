@@ -1,4 +1,4 @@
-﻿<ci:MyWindow x:Class="ClassIsland.Controls.JoinManagementDialog"
+<ci:MyWindow x:Class="ClassIsland.Controls.JoinManagementDialog"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -20,7 +20,7 @@
                 <Run Text="加入管理"/>
             </TextBlock>
             <TextBlock Margin="0 8 0 0" TextWrapping="Wrap">
-                <Run Text="将当前ClassIsland实例连接到管理组织。"></Run>
+                <Run Text="将当前 Classisland Lite by Yu 实例连接到管理组织。"></Run>
             </TextBlock>
             <Grid Margin="0 8 0 0" ColumnDefinitions="*,Auto">
                 <TextBlock Grid.Column="0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis">

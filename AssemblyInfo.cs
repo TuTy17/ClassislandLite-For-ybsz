@@ -10,8 +10,8 @@ using ClassIsland;
 [assembly: AssemblyInformationalVersion($"{GitInfo.Tag}+{GitInfo.CommitHash}")]
 #endif
 
-[assembly: AssemblyTitle("ClassIsland")]
-[assembly: AssemblyProduct("ClassIsland")]
+[assembly: AssemblyTitle("Classisland Lite by Yu")]
+[assembly: AssemblyProduct("Classisland Lite by Yu")]
 #if NETCOREAPP
 // [assembly: SupportedOSPlatform("Windows")]
 #endif

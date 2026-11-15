@@ -509,7 +509,6 @@ public partial class SettingsWindowNew : MyWindow, INavigationPageFactory
         Hide();
         SettingsService.SaveSettings("关闭应用设置窗口");
         ComponentsService.SaveConfig();
-        App.GetService<IAutomationService>().SaveConfig("关闭应用设置窗口");
         if (SettingsService.Settings.SettingsPagesCachePolicy <= 1)
         {
             _cachedPages.Clear();

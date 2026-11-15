@@ -47,7 +47,7 @@ public partial class SplashWindow : SplashWindowBase
     {
         SplashService.ProgressChanged += SplashServiceOnProgressChanged;
         await base.StartSplash();
-        PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.Transparent | WindowFeatures.ToolWindow, true);
+        PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.Transparent | WindowFeatures.ClickThrough | WindowFeatures.ToolWindow, true);
         _splashStatusObserver = SplashService.ObservableForProperty(x => x.SplashStatus)
             .Subscribe(_ => TryRunJobs());
         SetupIntroAnimation(AppLogo, TimeSpan.FromMilliseconds(0));

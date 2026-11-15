@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -248,9 +248,9 @@ public class ActionService : IActionService
         ));
 
         ActionMenuTree.Add(
-            new ActionMenuTreeGroup("ClassIsland", "\ue454",
-            new ActionMenuTreeItem("classisland.app.quit", "退出 ClassIsland", "\ue0df"),
-            new ActionMenuTreeItem("classisland.app.restart", "重启 ClassIsland", "\ue0bd")
+            new ActionMenuTreeGroup("Classisland Lite by Yu", "\ue454",
+            new ActionMenuTreeItem("classisland.app.quit", "退出 Classisland Lite by Yu", "\ue0df"),
+            new ActionMenuTreeItem("classisland.app.restart", "重启 Classisland Lite by Yu", "\ue0bd")
         ));
 
         return;
@@ -259,7 +259,7 @@ public class ActionService : IActionService
             new("classisland.settings", displayName, icon, s => s.Name = name);
     }
 
-    [Obsolete("注意！行动 v2 注册方法已过时，请参阅 ClassIsland 开发文档进行迁移。")]
+    [Obsolete("注意！行动 v2 注册方法已过时，请参阅项目开发文档进行迁移。")]
     public void RegisterActionHandler(string id, Action<object, string> i2)
     {
         var i1 = ObsoleteActionHandlers[id].Item1;
@@ -267,7 +267,7 @@ public class ActionService : IActionService
         ObsoleteActionHandlers[id] = (i1, i2, i3);
     }
 
-    [Obsolete("注意！行动 v2 注册方法已过时，请参阅 ClassIsland 开发文档进行迁移。")]
+    [Obsolete("注意！行动 v2 注册方法已过时，请参阅项目开发文档进行迁移。")]
     public void RegisterRevertHandler(string id, Action<object, string> i3)
     {
         var i1 = ObsoleteActionHandlers[id].Item1;

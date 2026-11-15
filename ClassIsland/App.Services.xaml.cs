@@ -30,12 +30,8 @@ using ClassIsland.Models.Rules;
 using ClassIsland.Platforms.Abstraction;
 using ClassIsland.Platforms.Abstraction.Services;
 using ClassIsland.Services;
-using ClassIsland.Services.AppUpdating;
-using ClassIsland.Services.Automation.Actions;
-using ClassIsland.Services.Automation.Triggers;
 using ClassIsland.Services.Logging;
 using ClassIsland.Services.Management;
-using ClassIsland.Services.Metadata;
 using ClassIsland.Services.NotificationProviders;
 using ClassIsland.Services.SpeechService;
 using ClassIsland.ViewModels;
@@ -48,7 +44,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.Extensions.Logging.EventLog;
-using Sentry;
 
 namespace ClassIsland;
 
@@ -57,14 +52,12 @@ public partial class App
     private void ConfigureServices(HostBuilderContext context, IServiceCollection services)
     {
         services.AddSingleton<SettingsService>();
-        services.AddSingleton<UpdateService>();
         services.AddSingleton<ITaskBarIconService, TaskBarIconService>();
         // services.AddSingleton<WallpaperPickingService>();
         services.AddSingleton<INotificationHostService, NotificationHostService>();
         services.AddSingleton<INotificationWorkerService, NotificationWorkerService>();
         services.AddSingleton<IThemeService, ThemeService>();
         services.AddSingleton<MiniInfoProviderHostService>();
-        services.AddSingleton<IWeatherService, WeatherService>();
         services.AddSingleton<FileFolderService>();
         services.AddSingleton<IAttachedSettingsHostService, AttachedSettingsHostService>();
         services.AddSingleton<IProfileService, ProfileService>();
@@ -80,21 +73,15 @@ public partial class App
         services.AddSingleton<IUriNavigationService, UriNavigationService>();
         services.AddHostedService<MemoryWatchDogService>();
         services.AddSingleton<IPluginService, PluginService>();
-        services.AddSingleton<IPluginMarketService, PluginMarketService>();
         services.AddSingleton<IRulesetService, RulesetService>();
         services.AddSingleton<IActionService, ActionService>();
         services.AddSingleton<IWindowRuleService, WindowRuleService>();
-        services.AddSingleton<IAutomationService, AutomationService>();
         services.AddSingleton<ISpeechService>(GetSpeechService);
         services.AddSingleton<IExactTimeService, ExactTimeService>();
         //services.AddSingleton(typeof(ApplicationCommand), ApplicationCommand);
         services.AddSingleton<IProfileAnalyzeService, ProfileAnalyzeService>();
         services.AddSingleton<IIpcService, IpcService>();
         services.AddSingleton<IAuthorizeService, AuthorizeService>();
-        services.AddSingleton<UriTriggerHandlerService>();
-        services.AddSingleton<SignalTriggerHandlerService>();
-        services.AddSingleton<TrayMenuTriggerHandlerService>();
-        services.AddSingleton<IAnnouncementService, AnnouncementService>();
         services.AddSingleton<ILocationService>(PlatformServices.LocationService);
         services.AddSingleton<IXamlThemeService, XamlThemeService>();
         services.AddSingleton<IAudioService, AudioService>();
@@ -120,15 +107,14 @@ public partial class App
         services.AddTransient<ComponentsSettingsViewModel>();
         services.AddTransient<NotificationSettingsViewModel>();
         services.AddTransient<WindowSettingsViewModel>();
-        services.AddTransient<WeatherSettingsViewModel>();
-        services.AddTransient<AutomationSettingsViewModel>();
-        services.AddTransient<PluginsSettingsPageViewModel>();
         services.AddTransient<StorageSettingsViewModel>();
         services.AddTransient<ErrorSettingsViewModel>();
         services.AddTransient<ThemesSettingsViewModel>();
-        services.AddTransient<UpdateSettingsPageViewModel>();
         services.AddTransient<DebugPageViewModel>();
         services.AddTransient<RefreshingSettingsViewModel>();
+        services.AddTransient<ExperimentalSettingsViewModel>();
+        services.AddTransient<DecibelSettingsViewModel>();
+        services.AddTransient<FullscreenReminderSettingsViewModel>();
         // Views
         services.AddTransient<ITopmostEffectPlayer>(x => x.GetRequiredService<TopmostEffectWindow>());
         services.AddSingleton<MainWindow>();
@@ -155,24 +141,19 @@ public partial class App
         // 设置页面分组
         services.AddSettingsPageGroup("classisland.general", "\uef27", "通用");
         services.AddSettingsPageGroup("classisland.mainwindow", "\uec85", "主界面");
+        services.AddSettingsPageGroup("classisland.experimental", "\ue945", "实验性功能");
+        services.AddSettingsPageGroup("classisland.decibel", "\ue9d9", "分贝检测器");
+        services.AddSettingsPageGroup("classisland.reminders", "\ue02b", "提醒");
         // 设置页面
         services.AddSettingsPage<GeneralSettingsPage>();
         services.AddSettingsPage<ClockSettingsPage>();
         services.AddSettingsPage<StorageSettingsPage>();
-        services.AddSettingsPage<PrivacySettingsPage>();
         services.AddSettingsPage<RefreshingSettingsPage>();
         services.AddSettingsPage<AdvancedSettingsPage>();
         services.AddSettingsPage<ComponentsSettingsPage>();
         services.AddSettingsPage<AppearanceSettingsPage>();
         services.AddSettingsPage<NotificationSettingsPage>();
         services.AddSettingsPage<WindowSettingsPage>();
-        services.AddSettingsPage<WeatherSettingsPage>();
-        services.AddSettingsPage<AutomationSettingsPage>();
-        if (UpdateService.AllowedPackageTypes.Contains(PackagingType))
-        {
-            services.AddSettingsPage<UpdateSettingsPage>();
-        }
-        services.AddSettingsPage<PluginsSettingsPage>();
         services.AddSettingsPage<ThemesSettingsPage>();
         services.AddSettingsPage<TestSettingsPage>();
         services.AddSettingsPage<DebugPage>();
@@ -182,24 +163,31 @@ public partial class App
         services.AddSettingsPage<ManagementCredentialsSettingsPage>();
         services.AddSettingsPage<ManagementPolicySettingsPage>();
         services.AddSettingsPage<ErrorSettingsPage>();
+        services.AddSettingsPage<ExperimentalSettingsPage>();
+        services.AddSettingsPage<DecibelSettingsPage>();
+        services.AddSettingsPage<FullscreenReminderSettingsPage>();
         // 主界面组件
         services.AddComponent<TextComponent, TextComponentSettingsControl>();
         services.AddComponent<SeparatorComponent>();
         services.AddComponent<ScheduleComponent, ScheduleComponentSettingsControl>();
         services.AddComponent<DateComponent>();
         services.AddComponent<ClockComponent, ClockComponentSettingsControl>();
-        services.AddComponent<WeatherComponent, WeatherComponentSettingsControl>();
         services.AddComponent<CountDownComponent, CountDownComponentSettingsControl>();
         services.AddComponent<SlideComponent, SlideComponentSettingsControl>();
         services.AddComponent<RollingComponent, RollingComponentSettingsControl>();
         services.AddComponent<GroupComponent>();
         services.AddComponent<StackComponent>();
+        services.AddComponent<CollapseButtonComponent>();
+        services.AddComponent<DecibelComponent>();
+        services.AddSingleton<CollapseHotspotService>();
+        services.AddSingleton<RecipeService>();
+        services.AddSingleton<FullscreenReminderService>();
+        services.AddSingleton<DecibelService>();
+        services.AddSingleton<QqNotificationMirrorService>();
         // 提醒提供方
         services.AddNotificationProvider<ClassNotificationProvider, ClassNotificationProviderSettingsControl>();
         services.AddNotificationProvider<AfterSchoolNotificationProvider, AfterSchoolNotificationProviderSettingsControl>();
-        services.AddNotificationProvider<WeatherNotificationProvider, WeatherNotificationProviderSettingsControl>();
         services.AddNotificationProvider<ManagementNotificationProvider>();
-        services.AddNotificationProvider<ActionNotificationProvider>();
         // // Transients
         // services.AddTransient<ExcelImportWindow>();
         // services.AddTransient<WallpaperPreviewWindow>();
@@ -211,15 +199,7 @@ public partial class App
 
             builder.AddFilter<EventLogLoggerProvider>(level => level >= LogLevel.Error);
             builder.AddConsoleFormatter<ClassIslandConsoleFormatter, ConsoleFormatterOptions>();
-            builder.AddConsole(console => { console.FormatterName = "classisland"; });
-            builder.AddSentry(o =>
-            {
-                o.InitializeSdk = false;
-                o.MinimumBreadcrumbLevel = LogLevel.Information;
-                o.EnableLogs = true;
-                o.SetBeforeSendLog(log => log.Level < SentryLogLevel.Info ? null : log);
-            });
-            var debug = false;
+            builder.AddConsole(console => { console.FormatterName = "classisland"; });            var debug = false;
 #if DEBUG
             debug = true;
 #endif
@@ -228,27 +208,13 @@ public partial class App
                 builder.SetMinimumLevel(LogLevel.Trace);
             }
         });
-        services.AddSingleton<ILoggerProvider, SentryLoggerProvider>();
         services.AddSingleton<ILoggerProvider, AppLoggerProvider>();
         services.AddSingleton<ILoggerProvider, FileLoggerProvider>();
         // AttachedSettings
         services.AddAttachedSettingsControl<AfterSchoolNotificationAttachedSettingsControl>();
         services.AddAttachedSettingsControl<ClassNotificationAttachedSettingsControl>();
         services.AddAttachedSettingsControl<LessonControlAttachedSettingsControl>();
-        services.AddAttachedSettingsControl<WeatherNotificationAttachedSettingsControl>();
         // 触发器
-        services.AddTrigger<RulesetChangedTrigger>();
-        services.AddTrigger<SignalTrigger, SignalTriggerSettingsControl>();
-        services.AddTrigger<UriTrigger, UriTriggerSettingsControl>();
-        services.AddTrigger<TrayMenuTrigger, TrayMenuTriggerSettingsControl>();
-        services.AddTrigger<CronTrigger, CronTriggerSettingsControl>();
-        services.AddTrigger<AppStartupTrigger>();
-        services.AddTrigger<AppStoppingTrigger>();
-        services.AddTrigger<OnClassTrigger>();
-        services.AddTrigger<OnBreakingTimeTrigger>();
-        services.AddTrigger<OnAfterSchoolTrigger>();
-        services.AddTrigger<CurrentTimeStateChangedTrigger>();
-        services.AddTrigger<PreTimePointTrigger, PreTimePointTriggerSettingsControl>();
         // 规则
         services.AddRule("classisland.test.true", "总是为真", onHandle: _ => true);
         services.AddRule("classisland.test.false", "总是为假", onHandle: _ => false);
@@ -260,20 +226,7 @@ public partial class App
         services.AddRule<CurrentSubjectRuleSettings, CurrentSubjectRuleSettingsControl>("classisland.lessons.nextSubject", "下节课科目是", "\uE217");
         services.AddRule<CurrentSubjectRuleSettings, CurrentSubjectRuleSettingsControl>("classisland.lessons.previousSubject", "上节课科目是", "\uE226");
         services.AddRule<TimeStateRuleSettings, TimeStateRuleSettingsControl>("classisland.lessons.timeState", "当前时间状态是", "\uE4C4");
-        services.AddRule<CurrentWeatherRuleSettings, CurrentWeatherRuleSettingsControl>("classisland.weather.currentWeather", "当前天气是", "\uE4DC");
-        services.AddRule<CurrentWeatherRuleSettings, CurrentWeatherRuleSettingsControl>("classisland.weather.tomorrowWeather", "明天天气是", "\uE4DC");
-        services.AddRule<StringMatchingSettings, RulesetStringMatchingSettingsControl>("classisland.weather.hasWeatherAlert", "存在气象预警", "\uF431");
-        services.AddRule<RainTimeRuleSettings, RainTimeRuleSettingsControl>("classisland.weather.rainTime", "距离降水开始/结束还剩", "\uF43F");
-        services.AddRule<SunRiseSetRuleSettings, SunRiseSetRuleSettingsControl>("classisland.weather.sunRiseSet", "是否日出/日落", "\uE150");
         // 行动提供方
-        services.AddAction<SignalTriggerSettings, BroadcastSignalActionSettingsControl>("classisland.broadcastSignal", "广播信号", "\uE561");
-        services.AddAction<RunAction, RunActionSettingsControl>();
-        services.AddAction<NotificationAction, NotificationActionSettingsControl>();
-        services.AddAction<SleepAction, SleepActionSettingsControl>();
-        services.AddAction<ModifyAppSettingsAction, ModifyAppSettingsActionSettingsControl>();
-        services.AddAction<WeatherNotificationAction, WeatherNotificationActionSettingControl>();
-        services.AddAction<AppQuitAction>();
-        services.AddAction<AppRestartAction, AppRestartActionSettingsControl>();
 
         // 认证提供方
         services.AddAuthorizeProvider<PasswordAuthorizeProvider>();
@@ -284,10 +237,6 @@ public partial class App
         services.AddSpeechProvider<EdgeTtsService, EdgeTtsSpeechServiceSettingsControl>();
         services.AddSpeechProvider<GptSoVitsService, GptSovitsSpeechServiceSettingsControl>();
         // 天气图标模板
-        services.AddWeatherIconTemplate("classisland.weatherIcons.lucide", "Lucide（默认）", (this.FindResource("LucideWeatherIconTemplate") as IDataTemplate)!);
-        services.AddWeatherIconTemplate("classisland.weatherIcons.fluentDesign", "Fluent Design", (this.FindResource("FluentDesignWeatherIconTemplate") as IDataTemplate)!);
-        services.AddWeatherIconTemplate("classisland.weatherIcons.sfSymbols", "SF Symbols", (this.FindResource("SFSymbolsWeatherIconTemplate") as IDataTemplate)!);
-        services.AddWeatherIconTemplate("classisland.weatherIcons.simpleText", "纯文本", (this.FindResource("SimpleTextWeatherIconTemplate") as IDataTemplate)!);
         // 档案迁移提供方
         services.AddProfileTransferProvider<CsesImportProvider>("classisland.profileTransfer.import.cses", "从 CSES 导入", ProfileTransferProviderType.Import, "\ue6cb");
         services.AddProfileTransferProvider<ClassIsland1ImportProvider>("classisland.profileTransfer.import.legacyV1", "从 ClassIsland 1.x 导入", ProfileTransferProviderType.Import, "bitmap(avares://ClassIsland/Assets/AppLogo.png)");
@@ -298,29 +247,24 @@ public partial class App
         {
             Id = "classisland.classic",
             Name = "经典",
-            Description = "ClassIsland 的经典外观。",
+            Description = "Classisland Lite by Yu 的经典外观。",
             Banner = "avares://ClassIsland/Assets/XamlThemePreviews/classisland.classic.png",
-            Author = "ClassIsland",
+            Author = "黄燕煜",
             Url = "https://github.com/ClassIsland/ClassIsland"
         });
         services.AddXamlTheme(new Uri("avares://ClassIsland/XamlThemes/FluentTheme/Styles.axaml"), new ThemeManifest()
         {
             Id = "classisland.fluent",
             Name = "Fluent",
-            Description = "焕然一新的 ClassIsland 外观。",
+            Description = "焕然一新的 Classisland Lite by Yu 外观。",
             Banner = "avares://ClassIsland/Assets/XamlThemePreviews/classisland.fluent.png",
-            Author = "ClassIsland",
+            Author = "黄燕煜",
             Url = "https://github.com/ClassIsland/ClassIsland",
             VerticalSafeAreaPx = 20
         });
         // 教程
         // services.AddTutorialGroupByUri(new Uri("avares://ClassIsland/Assets/Tutorials/classisland.test.json"));
         // services.AddTutorialGroupByUri(new Uri("avares://ClassIsland/Assets/Tutorials/classisland.sp.json"));
-        services.AddTutorialGroupByUri(new Uri("avares://ClassIsland/Assets/Tutorials/classisland.getStarted.json"));
         // Plugins
-        if (!ApplicationCommand.Safe && string.IsNullOrWhiteSpace(ApplicationCommand.ImportV1) && string.IsNullOrWhiteSpace(ApplicationCommand.ImportV2))
-        {
-            PluginService.InitializePlugins(context, services);
-        }
     }
 }

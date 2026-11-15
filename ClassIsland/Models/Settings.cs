@@ -220,6 +220,21 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
     private ObservableCollection<Guid> _trustedProfileIds = [];
     private bool _isNonExactCountdownEnabled = false;
     private bool _showDetailedStatusOnSplash = false;
+    private bool _isCarnivalModeEnabled = false;
+    private bool _isEntertainmentModeEnabled = false;
+    private string _entertainmentModeText = "Classisland Lite by Yu";
+    private bool _isRecipePreviewEnabled = false;
+    private string _recipeWorkbookPath = "";
+    private string _recipeLunchTriggerLessonKey = "";
+    private string _recipeDinnerTriggerLessonKey = "";
+    private int _recipeShowDelaySeconds = 3;
+    private int _recipeHideBeforeClassSeconds = 10;
+    private ObservableCollection<string> _fullscreenEmphasisLessonKeys = [];
+    private bool _isDecibelMonitorEnabled = false;
+    private string _decibelInputDeviceName = "";
+    private double _decibelCalibrationOffset = 0.0;
+    private ObservableCollection<string> _decibelVisibleLessonKeys = [];
+    private bool _isQqNotificationMirrorEnabled = false;
 
     public void NotifyPropertyChanged(string propertyName)
     {
@@ -2649,6 +2664,171 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         {
             if (value == _classPlanEditModeIndex) return;
             _classPlanEditModeIndex = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsCarnivalModeEnabled
+    {
+        get => _isCarnivalModeEnabled;
+        set
+        {
+            if (value == _isCarnivalModeEnabled) return;
+            _isCarnivalModeEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsEntertainmentModeEnabled
+    {
+        get => _isEntertainmentModeEnabled;
+        set
+        {
+            if (value == _isEntertainmentModeEnabled) return;
+            _isEntertainmentModeEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string EntertainmentModeText
+    {
+        get => _entertainmentModeText;
+        set
+        {
+            if (value == _entertainmentModeText) return;
+            _entertainmentModeText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsRecipePreviewEnabled
+    {
+        get => _isRecipePreviewEnabled;
+        set
+        {
+            if (value == _isRecipePreviewEnabled) return;
+            _isRecipePreviewEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string RecipeWorkbookPath
+    {
+        get => _recipeWorkbookPath;
+        set
+        {
+            if (value == _recipeWorkbookPath) return;
+            _recipeWorkbookPath = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string RecipeLunchTriggerLessonKey
+    {
+        get => _recipeLunchTriggerLessonKey;
+        set
+        {
+            if (value == _recipeLunchTriggerLessonKey) return;
+            _recipeLunchTriggerLessonKey = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string RecipeDinnerTriggerLessonKey
+    {
+        get => _recipeDinnerTriggerLessonKey;
+        set
+        {
+            if (value == _recipeDinnerTriggerLessonKey) return;
+            _recipeDinnerTriggerLessonKey = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int RecipeShowDelaySeconds
+    {
+        get => _recipeShowDelaySeconds;
+        set
+        {
+            if (value == _recipeShowDelaySeconds) return;
+            _recipeShowDelaySeconds = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int RecipeHideBeforeClassSeconds
+    {
+        get => _recipeHideBeforeClassSeconds;
+        set
+        {
+            if (value == _recipeHideBeforeClassSeconds) return;
+            _recipeHideBeforeClassSeconds = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ObservableCollection<string> FullscreenEmphasisLessonKeys
+    {
+        get => _fullscreenEmphasisLessonKeys;
+        set
+        {
+            if (Equals(value, _fullscreenEmphasisLessonKeys)) return;
+            _fullscreenEmphasisLessonKeys = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsDecibelMonitorEnabled
+    {
+        get => _isDecibelMonitorEnabled;
+        set
+        {
+            if (value == _isDecibelMonitorEnabled) return;
+            _isDecibelMonitorEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string DecibelInputDeviceName
+    {
+        get => _decibelInputDeviceName;
+        set
+        {
+            if (value == _decibelInputDeviceName) return;
+            _decibelInputDeviceName = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public double DecibelCalibrationOffset
+    {
+        get => _decibelCalibrationOffset;
+        set
+        {
+            if (value.Equals(_decibelCalibrationOffset)) return;
+            _decibelCalibrationOffset = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ObservableCollection<string> DecibelVisibleLessonKeys
+    {
+        get => _decibelVisibleLessonKeys;
+        set
+        {
+            if (Equals(value, _decibelVisibleLessonKeys)) return;
+            _decibelVisibleLessonKeys = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsQqNotificationMirrorEnabled
+    {
+        get => _isQqNotificationMirrorEnabled;
+        set
+        {
+            if (value == _isQqNotificationMirrorEnabled) return;
+            _isQqNotificationMirrorEnabled = value;
             OnPropertyChanged();
         }
     }

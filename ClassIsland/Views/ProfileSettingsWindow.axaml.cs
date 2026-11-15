@@ -285,10 +285,6 @@ public partial class ProfileSettingsWindow : MyWindow
         });
     }
     
-    private void ButtonHelp_OnClick(object? sender, RoutedEventArgs e)
-    {
-        UriNavigationCommands.UriNavigationCommand.Execute("https://docs.classisland.tech/app/profile/");
-    }
 
     #endregion
 

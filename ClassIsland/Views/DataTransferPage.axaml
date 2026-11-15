@@ -27,13 +27,13 @@
                             <TextBlock Text="数据迁移" HorizontalAlignment="Center"
                                        Margin="0 0 0 4"
                                        Theme="{StaticResource SubtitleTextBlockStyle}" />
-                            <TextBlock Text="向 ClassIsland 导入或从 ClassIsland 导出数据。"
+                            <TextBlock Text="在 Classisland Lite by Yu 实例之间导入或导出数据。"
                                        HorizontalAlignment="Center"
                                        Margin="0 0 0 8" />
                             <TabControl Classes="compact">
                                 <TabItem Header="导入">
                                     <StackPanel Classes="animated-intro" Spacing="2">
-                                        <controls:SettingsExpander Header="ClassIsland 2.x"
+                                        <controls:SettingsExpander Header="Classisland Lite by Yu 数据"
                                                                    IsClickEnabled="True"
                                                                    Click="SettingsExpanderImportFromClassIsland2_OnClick">
                                             <controls:SettingsExpander.IconSource>
@@ -41,7 +41,7 @@
                                                     UriSource="avares://ClassIsland/Assets/AppLogo.png" />
                                             </controls:SettingsExpander.IconSource>
                                         </controls:SettingsExpander>
-                                        <controls:SettingsExpander Header="ClassIsland 1.7.0.x"
+                                        <controls:SettingsExpander Header="旧版 ClassIsland 1.7 数据"
                                                                    IsClickEnabled="True"
                                                                    Click="SettingsExpanderImportFromClassIsland1_OnClick">
                                             <controls:SettingsExpander.IconSource>
@@ -57,9 +57,9 @@
                                 </TabItem>
                                 <TabItem Header="导出">
                                     <StackPanel Classes="animated-intro" Spacing="2">
-                                        <controls:InfoBar Message="此处的数据导出功能主要用于在不同 ClassIsland 实例间转移数据。若需导出诊断信息，请前往【应用设置】->【更多选项…】->【导出诊断数据】；若需备份应用数据，请使用【应用设置】->【通用】->【存储】中的备份功能。"
+                                        <controls:InfoBar Message="此处的数据导出功能主要用于在不同 Classisland Lite by Yu 实例间转移数据。若需导出诊断信息，请前往【应用设置】->【更多选项…】->【导出诊断数据】；若需备份应用数据，请使用【应用设置】->【通用】->【存储】中的备份功能。"
                                                           IsOpen="True" IsClosable="False"/>
-                                        <controls:SettingsExpander Header="ClassIsland 2.x"
+                                        <controls:SettingsExpander Header="Classisland Lite by Yu 数据"
                                                                    IsClickEnabled="True"
                                                                    Click="SettingsExpanderExportToClassIsland2_OnClick">
                                             <controls:SettingsExpander.IconSource>

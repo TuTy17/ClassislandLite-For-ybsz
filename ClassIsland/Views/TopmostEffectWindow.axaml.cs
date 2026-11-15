@@ -124,7 +124,7 @@ public partial class TopmostEffectWindow : Window, ITopmostEffectPlayer
         Topmost = true;
         base.Show();
         PlatformServices.WindowPlatformService.SetWindowFeature(this, 
-            WindowFeatures.Transparent | WindowFeatures.ToolWindow | WindowFeatures.Topmost | WindowFeatures.SkipManagement, true);
+            WindowFeatures.Transparent | WindowFeatures.ClickThrough | WindowFeatures.ToolWindow | WindowFeatures.Topmost | WindowFeatures.SkipManagement, true);
     }
 
     private void Control_OnLoaded(object? sender, RoutedEventArgs e)

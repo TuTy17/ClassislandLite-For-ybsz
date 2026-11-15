@@ -27,7 +27,6 @@ public partial class RefreshingPage : UserControl, IWelcomePage
     public WelcomeViewModel ViewModel { get; set; } = null!;
 
     private IComponentsService ComponentsService { get; } = IAppHost.GetService<IComponentsService>();
-    private IAutomationService AutomationService { get; } = IAppHost.GetService<IAutomationService>();
     private SettingsService SettingsService { get; } = IAppHost.GetService<SettingsService>();
     
     public RefreshingPage()
@@ -99,24 +98,8 @@ public partial class RefreshingPage : UserControl, IWelcomePage
                 ComponentsService.RefreshConfigs();
                 SettingsService.Settings.CurrentComponentConfig = newName;
             }
-            if (scope.Automations)
-            {
-                var newName = Guid.NewGuid().ToString();
-                var path = Path.Combine(Services.AutomationService.AutomationConfigsFolderPath,
-                    newName + ".json");
-                ConfigureFileHelper.SaveConfig(path, new ObservableCollection<Workflow>());
-                AutomationService.RefreshConfigs();
-                SettingsService.Settings.CurrentAutomationConfig = newName;
-            }
 
-            if (scope.Plugins)
-            {
-                foreach (var plugin in IPluginService.LoadedPlugins)
-                {
-                    plugin.IsEnabled = false;
-                }
-            }
-            
+
             if (!restartRequired)
             {
                 this.ShowToast("翻新成功。");

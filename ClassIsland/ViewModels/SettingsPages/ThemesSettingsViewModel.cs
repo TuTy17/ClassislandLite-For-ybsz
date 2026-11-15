@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using ClassIsland.Core.Abstractions.Services;
 using ClassIsland.Core.ComponentModels;
@@ -14,7 +14,6 @@ namespace ClassIsland.ViewModels.SettingsPages;
 public partial class ThemesSettingsViewModel : ObservableObject
 {
     public IXamlThemeService XamlThemeService { get; }
-    public IPluginMarketService PluginMarketService { get; }
     public SettingsService SettingsService { get; }
     
     [ObservableProperty] private ThemeInfo? _selectedThemeInfo;
@@ -30,10 +29,9 @@ public partial class ThemesSettingsViewModel : ObservableObject
     public SyncDictionaryList<string, ThemeInfo> MergedThemes { get; set; } = null!;
     
     /// <inheritdoc/>
-    public ThemesSettingsViewModel(IXamlThemeService xamlThemeService, IPluginMarketService pluginMarketService, SettingsService settingsService)
+    public ThemesSettingsViewModel(IXamlThemeService xamlThemeService, SettingsService settingsService)
     {
         XamlThemeService = xamlThemeService;
-        PluginMarketService = pluginMarketService;
         SettingsService = settingsService;
         
         UpdateMergedThemes();

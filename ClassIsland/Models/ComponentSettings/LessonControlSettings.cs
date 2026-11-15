@@ -1,4 +1,4 @@
-﻿using ClassIsland.Shared.Abstraction.Models;
+using ClassIsland.Shared.Abstraction.Models;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ClassIsland.Models.ComponentSettings;
@@ -17,7 +17,7 @@ public class LessonControlSettings : ObservableRecipient, ILessonControlSettings
     private string _placeholderTextNoClass = "今天没有课程。";
     private string _placeholderTextAllClassEnded = "今日课程已全部结束。";
     private bool _showTomorrowSchedules = false;
-    private int _tomorrowScheduleShowMode = 1;
+    private int _tomorrowScheduleShowMode = 4;
     private bool _highlightChangedClass = false;
     private bool _isNonExactCountdownEnabled = false;
     private bool _fadeCompletedClasses = true;
