@@ -1726,8 +1726,8 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         RecipeMainOverlay.Height = 0;
         RecipeMainOverlay.Transitions = transitions;
 
-        // 面板位于主界面窗口内的独立图层，窗口需要显式让出这段空间。
-        _recipePanelExtraHeight = _recipePanelMargin.Top + targetHeight;
+        // 面板位于主界面窗口内的独立图层，窗口需要显式让出这段空间（课表条本身的高度已经算在内）。
+        _recipePanelExtraHeight = Math.Max(0, _recipePanelMargin.Top + targetHeight - GetMainWindowLineHeight());
         UpdateWindowPos();
 
         var animation = new Animation
