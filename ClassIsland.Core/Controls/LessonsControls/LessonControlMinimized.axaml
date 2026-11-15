@@ -37,14 +37,14 @@
             <Border Width="10"/>
         </LayoutTransformControl>
 
-        <Grid VerticalAlignment="Center">
-            <Grid.DataContext>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <StackPanel.DataContext>
                 <MultiBinding Converter="{StaticResource SubjectIdToSubjectConverter}"
                               FallbackValue="{x:Static profile:Subject.Fallback}">
                     <Binding Path="#LessonControlMinimizedRoot.Subjects"/>
                     <Binding Path="#LessonControlMinimizedRoot.ClassInfo.SubjectId"/>
                 </MultiBinding>
-            </Grid.DataContext>
+            </StackPanel.DataContext>
             
             <controls:HighlightBox x:Name="TextHighlightBox">
                 <TextBlock VerticalAlignment="Center"
@@ -55,7 +55,7 @@
                        VerticalAlignment="Center"
                        FontSize="{DynamicResource MainWindowSecondaryFontSize}"
                        Text="{Binding GroupRemainingText, RelativeSource={RelativeSource AncestorType=local:LessonControlMinimized}}" />
-        </Grid>
+        </StackPanel>
 
         <LayoutTransformControl>
             <LayoutTransformControl.LayoutTransform>

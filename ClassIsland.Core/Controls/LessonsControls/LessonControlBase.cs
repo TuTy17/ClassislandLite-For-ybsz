@@ -1,4 +1,4 @@
-﻿using System.Reactive.Linq;
+using System.Reactive.Linq;
 using System.Windows;
 using Avalonia;
 using Avalonia.Controls;
@@ -65,8 +65,8 @@ public abstract class LessonControlBase : UserControl
 
     public LessonControlBase()
     {
-        this.GetObservable(ClassPlanProperty).Skip(1).Subscribe(_ => UpdateClassInfo());
-        this.GetObservable(CurrentTimeLayoutItemProperty).Skip(1).Subscribe(_ => UpdateClassInfo());
+        this.GetObservable(ClassPlanProperty).Subscribe(_ => UpdateClassInfo());
+        this.GetObservable(CurrentTimeLayoutItemProperty).Subscribe(_ => UpdateClassInfo());
     }
 
     private void UpdateClassInfo()

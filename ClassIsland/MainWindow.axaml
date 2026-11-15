@@ -232,8 +232,7 @@
                                 </Style>
                             </StackPanel.Styles>
                             <LayoutTransformControl x:Name="RootLayoutTransformControl"
-                                                    ClipToBounds="False"
-                                                    IsVisible="{Binding !RecipeService.IsFullscreenVisible}">
+                                                    ClipToBounds="False">
                                 <LayoutTransformControl.RenderTransform>
                                     <TranslateTransform X="{Binding ViewModel.ActualRootOffsetX}"
                                                         Y="{Binding ViewModel.ActualRootOffsetY}" />
@@ -571,84 +570,105 @@
 
                                 </Grid>
                             </LayoutTransformControl>
-                            <Border x:Name="RecipeMainOverlay"
-                                    IsVisible="{Binding RecipeService.IsFullscreenVisible}"
-                                    Classes.visible="{Binding RecipeService.IsFullscreenVisible}"
-                                    Margin="6,4"
-                                    Padding="16,10"
-                                    MinHeight="84"
-                                    MaxHeight="200"
-                                    HorizontalAlignment="Stretch"
-                                    Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-                                    BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="{DynamicResource ControlCornerRadius}"
-                                    RenderTransformOrigin="0.5,0.5">
-                                <Border.Styles>
-                                    <Style Selector="Border#RecipeMainOverlay">
-                                        <Setter Property="Opacity" Value="0"/>
-                                        <Setter Property="RenderTransform" Value="scale(0.97)"/>
-                                    </Style>
-                                    <Style Selector="Border#RecipeMainOverlay.visible">
-                                        <Setter Property="Opacity" Value="1"/>
-                                        <Setter Property="RenderTransform" Value="scale(1)"/>
-                                    </Style>
-                                </Border.Styles>
-                                <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,Auto">
-                                    <TextBlock Text="{Binding RecipeService.Title}"
-                                               FontSize="22"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"/>
-                                    <Button Grid.Column="1"
-                                            Content="×"
-                                            Theme="{StaticResource TransparentButton}"
-                                            Width="34"
-                                            Height="34"
-                                            FontSize="22"
-                                            Click="ButtonCloseInlineRecipe_OnClick"/>
-                                    <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2"
-                                                  Margin="0,6,0,0"
-                                                  MaxHeight="132"
-                                                  VerticalScrollBarVisibility="Auto"
-                                                  HorizontalScrollBarVisibility="Disabled">
-                                        <ItemsControl ItemsSource="{Binding RecipeService.ActiveSections}">
-                                            <ItemsControl.ItemsPanel>
-                                                <ItemsPanelTemplate>
-                                                    <WrapPanel Orientation="Horizontal"/>
-                                                </ItemsPanelTemplate>
-                                            </ItemsControl.ItemsPanel>
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Border MinWidth="220"
-                                                            MaxWidth="440"
-                                                            Margin="0,0,8,8"
-                                                            Padding="12,8"
-                                                            CornerRadius="8"
-                                                            Background="{DynamicResource SolidBackgroundFillColorBaseBrush}"
-                                                            BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
-                                                            BorderThickness="1">
-                                                        <StackPanel Spacing="4">
-                                                            <TextBlock Text="{Binding Name}"
-                                                                       FontSize="15"
-                                                                       FontWeight="SemiBold"
-                                                                       Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
-                                                            <TextBlock Text="{Binding ItemsText}"
-                                                                       FontSize="20"
-                                                                       LineHeight="28"
-                                                                       TextWrapping="Wrap"/>
-                                                        </StackPanel>
-                                                    </Border>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
-                                    </ScrollViewer>
-                                </Grid>
-                            </Border>
+
+
                         </StackPanel>
                     </VisualLayerManager>
                 </Panel>
             </Canvas>
         </ZoomBorder>
+
+        <Border x:Name="RecipeMainOverlay"
+                Width="620"
+                IsVisible="False"
+                MinHeight="48"
+                ClipToBounds="True"
+                Margin="0,44,0,0"
+                Padding="16,10,14,12"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+                ZIndex="900"
+                Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
+                BorderBrush="{DynamicResource ControlElevationBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="10"
+                BoxShadow="0 4 8 2 #48000000"
+                TextElement.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+                Classes.fullscreen="{Binding RecipeService.IsFullscreenForeground}">
+            <Border.Transitions>
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.18" />
+                    <DoubleTransition Property="Height" Duration="0:0:0.26" Easing="CubicEaseOut" />
+                </Transitions>
+            </Border.Transitions>
+            <Border.Styles>
+                <Style Selector="Border#RecipeMainOverlay.fullscreen TextBlock.recipe-title">
+                    <Setter Property="FontSize" Value="26" />
+                </Style>
+                <Style Selector="Border#RecipeMainOverlay.fullscreen TextBlock.recipe-value">
+                    <Setter Property="FontSize" Value="{DynamicResource MainWindowLargeFontSize}" />
+                </Style>
+                <Style Selector="Border#RecipeMainOverlay.fullscreen TextBlock.recipe-label">
+                    <Setter Property="FontSize" Value="{DynamicResource MainWindowBodyFontSize}" />
+                </Style>
+            </Border.Styles>
+            <Grid RowDefinitions="Auto,*">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <TextBlock Classes="recipe-title"
+                                   Text="{Binding RecipeService.Title}"
+                                   FontSize="{DynamicResource MainWindowLargeFontSize}"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center" />
+                        <Border Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                CornerRadius="12"
+                                Padding="9,1"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="{Binding RecipeService.SubTitle}"
+                                       Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
+                                       FontSize="{DynamicResource MainWindowSecondaryFontSize}" />
+                        </Border>
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="&#x2715;"
+                            Theme="{StaticResource TransparentButton}"
+                            Width="30"
+                            Height="30"
+                            FontSize="14"
+                            VerticalAlignment="Top"
+                            Click="ButtonCloseInlineRecipe_OnClick" />
+                </Grid>
+                <ScrollViewer Grid.Row="1"
+                              Margin="0,6,0,0"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl ItemsSource="{Binding RecipeService.ActiveSections}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                                    <Border Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                            CornerRadius="6"
+                                            Padding="8,1"
+                                            Margin="0,2,10,0"
+                                            VerticalAlignment="Top">
+                                        <TextBlock Classes="recipe-label"
+                                                   Text="{Binding Name}"
+                                                   Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
+                                                   FontSize="{DynamicResource MainWindowSecondaryFontSize}" />
+                                    </Border>
+                                    <TextBlock Grid.Column="1"
+                                               Classes="recipe-value"
+                                               Text="{Binding ItemsText}"
+                                               FontSize="{DynamicResource MainWindowBodyFontSize}"
+                                               LineHeight="24"
+                                               TextWrapping="Wrap" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
 
         <Border x:Name="EntertainmentModeOverlay"
                 IsVisible="{Binding ViewModel.Settings.IsEntertainmentModeEnabled}"

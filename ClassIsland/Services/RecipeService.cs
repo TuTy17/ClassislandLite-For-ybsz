@@ -28,14 +28,27 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
     private string _dismissedOccurrence = "";
     private DateTime _manualPreviewUntil = DateTime.MinValue;
     private string _title = "";
+    private string _subTitle = "";
     private string _content = "";
-    private bool _isFullscreenVisible;
+    private bool _isVisible;
+    private bool _isFullscreenForeground;
     private bool _isInitialized;
     private string _statusText = "尚未导入菜单";
 
     public string Title { get => _title; private set => SetProperty(ref _title, value); }
+    public string SubTitle { get => _subTitle; private set => SetProperty(ref _subTitle, value); }
     public string Content { get => _content; private set => SetProperty(ref _content, value); }
-    public bool IsFullscreenVisible { get => _isFullscreenVisible; private set => SetProperty(ref _isFullscreenVisible, value); }
+    public bool IsVisible { get => _isVisible; private set => SetProperty(ref _isVisible, value); }
+
+    /// <summary>
+    /// 当前前台窗口是否处于全屏状态。全屏时食谱改为在主界面内放大显示并允许滚动。
+    /// </summary>
+    public bool IsFullscreenForeground
+    {
+        get => _isFullscreenForeground;
+        set => SetProperty(ref _isFullscreenForeground, value);
+    }
+
     public string StatusText { get => _statusText; private set => SetProperty(ref _statusText, value); }
     public ObservableCollection<RecipeSection> ActiveSections { get; } = [];
 
@@ -79,10 +92,9 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
 
     public void ShowPreview(RecipeDay day, bool lunch)
     {
-        Title = $"今日{(lunch ? "午餐" : "晚餐")}";
         SetActiveSections(day, lunch);
         _manualPreviewUntil = DateTime.MaxValue;
-        IsFullscreenVisible = true;
+        IsVisible = true;
     }
 
     public bool TryGetTodayRecipe(out RecipeDay? recipe)
@@ -162,7 +174,7 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
         _manualPreviewUntil = DateTime.MinValue;
         if (!_settingsService.Settings.IsRecipePreviewEnabled)
         {
-            HideAll();
+            HideAll("未启用");
             return;
         }
 
@@ -171,16 +183,19 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
         var current = _lessonsService.CurrentTimeLayoutItem;
         if (plan?.TimeLayout == null || current?.TimeType != 1)
         {
-            HideAll();
+            HideAll($"不在课间 plan={plan != null} type={current?.TimeType}");
             return;
         }
 
         var hideBefore = Math.Max(0, _settingsService.Settings.RecipeHideBeforeClassSeconds);
-        var nextClass = _lessonsService.NextClassTimeLayoutItem;
-        if (nextClass == null || nextClass == TimeLayoutItem.Empty ||
-            nextClass.StartTime - now.TimeOfDay <= TimeSpan.FromSeconds(hideBefore))
+        // 直接从当前课表计算下一节课，避免依赖可能滞后的课程状态。
+        var nextClass = plan.ValidTimeLayoutItems
+            .Where(item => item.TimeType == 0 && item.StartTime > now.TimeOfDay)
+            .OrderBy(item => item.StartTime)
+            .FirstOrDefault();
+        if (nextClass != null && nextClass.StartTime - now.TimeOfDay <= TimeSpan.FromSeconds(hideBefore))
         {
-            HideAll();
+            HideAll($"临近下节课 next={nextClass.StartTime} now={now.TimeOfDay} hideBefore={hideBefore}");
             return;
         }
 
@@ -190,7 +205,7 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
             .FirstOrDefault();
         if (previousClass == null)
         {
-            HideAll();
+            HideAll("没有已结束课程");
             return;
         }
 
@@ -199,7 +214,7 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
         var isDinner = lessonKey == _settingsService.Settings.RecipeDinnerTriggerLessonKey;
         if (!isLunch && !isDinner)
         {
-            HideAll();
+            HideAll($"课程不匹配 {lessonKey}");
             return;
         }
 
@@ -218,20 +233,23 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
         var recipe = _days.FirstOrDefault(day => day.MatchesDate(now.Date));
         if (recipe == null)
         {
+            _logger.LogInformation("食谱预览：菜单中没有 {Date:MM-dd} 的餐食安排（已识别 {Count} 天）。", now.Date, _days.Count);
             return;
         }
 
         if (_activeOccurrence != occurrence)
         {
             _activeOccurrence = occurrence;
-            Title = $"今日{(isLunch ? "午餐" : "晚餐")}";
             SetActiveSections(recipe, isLunch);
+            _logger.LogInformation("食谱预览：显示{Meal}，课程 {Lesson}。", isLunch ? "午餐" : "晚餐", lessonKey);
         }
-        IsFullscreenVisible = true;
+        IsVisible = true;
     }
 
     private void SetActiveSections(RecipeDay day, bool lunch)
     {
+        Title = $"今日{(lunch ? "午餐" : "晚餐")}";
+        SubTitle = $"{day.Month} 月 {day.Day} 日";
         ActiveSections.Clear();
         foreach (var section in day.GetSections(lunch))
         {
@@ -250,9 +268,13 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
         }
     }
 
-    private void HideAll()
+    private void HideAll(string reason = "")
     {
-        IsFullscreenVisible = false;
+        if (IsVisible)
+        {
+            _logger.LogInformation("食谱预览隐藏：{Reason}", reason);
+        }
+        IsVisible = false;
     }
 
     public void Dispose()

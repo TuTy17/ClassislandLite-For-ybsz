@@ -22,6 +22,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using ClassIsland.Controls;
 using ClassIsland.Controls.EditMode;
 using ClassIsland.Core;
 using ClassIsland.Core.Abstractions.Services;
@@ -165,6 +166,10 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
 
     private List<object> TopmostLocks { get; } = [];
 
+    private double _recipePanelExtraHeight;
+    private Thickness _recipePanelMargin;
+    private IDisposable? _recipeCollapseTimer;
+
 
     public static readonly StyledProperty<double> BackgroundWidthProperty = AvaloniaProperty.Register<MainWindow, double>(
         nameof(BackgroundWidth));
@@ -234,6 +239,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         TutorialService = tutorialService;
         RecipeService = recipeService;
         QqNotificationMirrorService = qqNotificationMirrorService;
+        RecipeService.PropertyChanged += RecipeServiceOnPropertyChanged;
         
         ViewModel = new MainViewModel();
         DataContext = this;
@@ -920,7 +926,7 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         if (LayoutContainerGrid != null)
         {
             LayoutContainerGrid.Width = Width = screen.Bounds.Width / dpiX;
-            LayoutContainerGrid.Height = Height = StackPanelRootContainer.Bounds.Height + safeT + safeB;
+            LayoutContainerGrid.Height = Height = StackPanelRootContainer.Bounds.Height + safeT + safeB + _recipePanelExtraHeight;
         }
         ViewModel.ActualRootOffsetX = 0;
         ViewModel.ActualRootOffsetY = 0;
@@ -1655,6 +1661,126 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
     private void ButtonCloseInlineRecipe_OnClick(object? sender, RoutedEventArgs e)
     {
         RecipeService.Dismiss();
+    }
+
+    private void RecipeServiceOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(RecipeService.IsVisible) || RecipeMainOverlay == null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (RecipeService.IsVisible)
+            {
+                ShowRecipePanel();
+            }
+            else
+            {
+                HideRecipePanel();
+            }
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError(exception, "无法切换食谱预览面板。");
+        }
+    }
+
+    private void ShowRecipePanel()
+    {
+        RecipeService.IsFullscreenForeground = ViewModel.IsForegroundFullscreen;
+        var availableWidth = Bounds.Width > 100 ? Bounds.Width - 96 : 1080;
+        var minimumWidth = RecipeService.IsFullscreenForeground ? 620 : 460;
+        RecipeMainOverlay.Width = Math.Clamp(GetRecipePanelTargetWidth(), minimumWidth, Math.Max(minimumWidth, Math.Min(1100, availableWidth)));
+        RecipeMainOverlay.MaxHeight = RecipeService.IsFullscreenForeground
+            ? Math.Max(260, Bounds.Height * 0.42)
+            : 260;
+
+        // 面板与课表条顶部对齐，留出主界面条的高度，保证两者不重叠。
+        var stripHeight = GetMainWindowLineHeight();
+        _recipePanelMargin = new Thickness(0, stripHeight + 6, 0, 0);
+        RecipeMainOverlay.Margin = _recipePanelMargin;
+        RecipeMainOverlay.IsVisible = true;
+        RecipeMainOverlay.Opacity = 0;
+
+        Dispatcher.UIThread.Post(ExpandRecipePanel, DispatcherPriority.Loaded);
+    }
+
+    private void ExpandRecipePanel()
+    {
+        if (!RecipeService.IsVisible || RecipeMainOverlay == null)
+        {
+            return;
+        }
+
+        var transitions = RecipeMainOverlay.Transitions;
+        RecipeMainOverlay.Transitions = null;
+        RecipeMainOverlay.Height = double.NaN;
+        RecipeMainOverlay.Measure(new Size(Math.Max(1, RecipeMainOverlay.Width), double.PositiveInfinity));
+        var measured = RecipeMainOverlay.DesiredSize.Height;
+        var targetHeight = Math.Clamp(measured, 48, RecipeMainOverlay.MaxHeight);
+        RecipeMainOverlay.Height = 0;
+        RecipeMainOverlay.Transitions = transitions;
+
+        // 面板现在位于主界面窗口内的独立图层，窗口需要显式让出这段空间。
+        _recipePanelExtraHeight = _recipePanelMargin.Top + targetHeight;
+        UpdateWindowPos();
+
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (!RecipeService.IsVisible)
+            {
+                return;
+            }
+
+            RecipeMainOverlay.Height = targetHeight;
+            RecipeMainOverlay.Opacity = 1;
+        }, DispatcherPriority.Render);
+    }
+
+    private void HideRecipePanel()
+    {
+        if (RecipeMainOverlay == null)
+        {
+            return;
+        }
+
+        RecipeMainOverlay.Opacity = 0;
+        _recipeCollapseTimer?.Dispose();
+        _recipeCollapseTimer = DispatcherTimer.RunOnce(() =>
+        {
+            if (RecipeService.IsVisible)
+            {
+                return;
+            }
+
+            RecipeMainOverlay.IsVisible = false;
+            RecipeMainOverlay.Height = 0;
+            _recipePanelExtraHeight = 0;
+            UpdateWindowPos();
+        }, TimeSpan.FromMilliseconds(200));
+    }
+
+    private double GetRecipePanelTargetWidth()
+    {
+        var lines = RootMainWindowLinesItemsControl?
+            .GetVisualDescendants()
+            .OfType<MainWindowLine>()
+            .ToList();
+        var line = lines?.FirstOrDefault(x => x.IsMainLine) ?? lines?.FirstOrDefault();
+        var width = line?.BackgroundWidth ?? 0;
+        return width > 120 ? width : 560;
+    }
+
+    private double GetMainWindowLineHeight()
+    {
+        var lines = RootMainWindowLinesItemsControl?
+            .GetVisualDescendants()
+            .OfType<MainWindowLine>()
+            .ToList();
+        var line = lines?.FirstOrDefault(x => x.IsMainLine) ?? lines?.FirstOrDefault();
+        return line?.Bounds.Height > 4 ? line.Bounds.Height : 40;
     }
     #endregion
 }

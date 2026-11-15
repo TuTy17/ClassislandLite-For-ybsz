@@ -1,4 +1,4 @@
-﻿using ClassIsland.Shared.Models.Profile;
+using ClassIsland.Shared.Models.Profile;
 using CsesSharp.Enums;
 using CsesSharp.Models;
 using ClassInfo = ClassIsland.Shared.Models.Profile.ClassInfo;
@@ -67,7 +67,10 @@ public static class CsesExtensions
             bool isNewTimeLayout = timeLayoutKey == Guid.Empty;
             if (isNewTimeLayout)
             {
-                timeLayout = new TimeLayout();
+                timeLayout = new TimeLayout()
+                {
+                    Name = string.IsNullOrWhiteSpace(i.Name) ? "导入的时间表" : i.Name
+                };
                 timeLayoutKey = Guid.NewGuid();
             }
             else

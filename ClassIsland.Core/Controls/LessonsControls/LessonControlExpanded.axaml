@@ -55,13 +55,7 @@
                 <Border Width="16"/>
             </LayoutTransformControl>
             
-            <Grid>
-                <!-- <Grid.DataContext> -->
-                <!--     <MultiBinding Converter="{StaticResource SubjectIdToSubjectConverter}"> -->
-                <!--         <Binding Path="Subjects" RelativeSource="{RelativeSource FindAncestor, AncestorType=local:LessonControlExpanded}"/> -->
-                <!--         <Binding Path="ClassInfo.SubjectId" RelativeSource="{RelativeSource FindAncestor, AncestorType=local:LessonControlExpanded}"/> -->
-                <!--     </MultiBinding> -->
-                <!-- </Grid.DataContext> -->
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <controls:HighlightBox x:Name="TextHighlightBox">
                     <TextBlock VerticalAlignment="Center" FontSize="{DynamicResource MainWindowEmphasizedFontSize}"
                                FontWeight="Bold" Text="{Binding DisplayingSubject.Name, Mode=OneWay}"/>
@@ -71,7 +65,7 @@
                            FontSize="{DynamicResource MainWindowBodyFontSize}"
                            FontWeight="SemiBold"
                            Text="{Binding GroupRemainingText, RelativeSource={RelativeSource AncestorType=local:LessonControlExpanded}}" />
-            </Grid>
+            </StackPanel>
             
             <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                 <Panel Margin="6 0 0 0"
