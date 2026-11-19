@@ -19,7 +19,7 @@
                     VerticalAlignment="Center"
                     MaxWidth="1200"
                     Margin="80,0">
-            <TextBlock Text="校园提醒"
+            <TextBlock x:Name="CaptionText" Text="校园提醒"
                        HorizontalAlignment="Center"
                        Foreground="#8FB7FF"
                        FontSize="30"

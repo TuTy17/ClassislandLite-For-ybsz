@@ -32,6 +32,14 @@
                                  Width="380" />
                     </ui:SettingsExpanderItem.Footer>
                 </ui:SettingsExpanderItem>
+                <ui:SettingsExpanderItem Content="提醒标题"
+                                         Description="显示在消息上方的小标题，留空则不显示。">
+                    <ui:SettingsExpanderItem.Footer>
+                        <TextBox Text="{Binding ViewModel.SettingsService.Settings.RemoteMessageTitle, Mode=TwoWay}"
+                                 Watermark="校园提醒"
+                                 Width="380" />
+                    </ui:SettingsExpanderItem.Footer>
+                </ui:SettingsExpanderItem>
                 <ui:SettingsExpanderItem Content="轮询间隔"
                                          Description="越短越及时，机器多时可以调大一点。">
                     <ui:SettingsExpanderItem.Footer>

@@ -222,7 +222,7 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
 
         var message = _queue.Dequeue();
         var settings = _settingsService.Settings;
-        var window = new RemoteMessageWindow(_audioService, settings.RemoteMessageSoundVolume);
+        var window = new RemoteMessageWindow(_audioService, settings.RemoteMessageSoundVolume, settings.RemoteMessageTitle);
         window.ShowMessage(message);
         window.Dismissed += (_, _) =>
         {

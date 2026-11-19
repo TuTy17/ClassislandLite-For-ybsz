@@ -226,6 +226,7 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
     private string _remoteMessageDeviceId = "";
     private int _remoteMessagePollSeconds = 5;
     private double _remoteMessageSoundVolume = 0.8;
+    private string _remoteMessageTitle = "校园提醒";
     private long _remoteMessageLastId = 0;
     private bool _remoteMessageSynced = false;
     private bool _isRecipePreviewEnabled = false;
@@ -2798,6 +2799,21 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
             value = Math.Clamp(value, 0, 1);
             if (value.Equals(_remoteMessageSoundVolume)) return;
             _remoteMessageSoundVolume = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 远程提醒里显示在消息上方的小标题，留空则不显示。
+    /// </summary>
+    public string RemoteMessageTitle
+    {
+        get => _remoteMessageTitle;
+        set
+        {
+            value ??= "";
+            if (value == _remoteMessageTitle) return;
+            _remoteMessageTitle = value;
             OnPropertyChanged();
         }
     }

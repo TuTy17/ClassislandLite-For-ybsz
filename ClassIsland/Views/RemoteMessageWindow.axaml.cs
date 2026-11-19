@@ -19,11 +19,15 @@ public partial class RemoteMessageWindow : Window
 
     public event EventHandler? Dismissed;
 
-    public RemoteMessageWindow(IAudioService audioService, double volume)
+    public RemoteMessageWindow(IAudioService audioService, double volume, string caption)
     {
         _audioService = audioService;
         _volume = Math.Clamp(volume, 0, 1);
         InitializeComponent();
+
+        // 标题文字由用户在应用设置里自定义，留空时整行隐藏。
+        CaptionText.Text = caption ?? "";
+        CaptionText.IsVisible = !string.IsNullOrWhiteSpace(caption);
 
         _beepTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
         _beepTimer.Tick += (_, _) => PlayBeep();
