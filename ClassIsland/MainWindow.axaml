@@ -669,12 +669,12 @@
                                             <TextBlock Classes="recipe-label"
                                                        Text="{Binding Name}"
                                                        Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
-                                                       FontSize="{Binding ViewModel.Settings.RecipeScale, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=14}" />
+                                                       FontSize="{Binding $parent[Window].ViewModel.Settings.RecipeScale, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=14}" />
                                         </Border>
                                         <TextBlock Grid.Column="1"
                                                    Classes="recipe-value"
                                                    Text="{Binding ItemsText}"
-                                                   FontSize="{Binding ViewModel.Settings.RecipeScale, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=16}"
+                                                   FontSize="{Binding $parent[Window].ViewModel.Settings.RecipeScale, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=16}"
                                                    TextWrapping="Wrap" />
                                     </Grid>
                                 </DataTemplate>

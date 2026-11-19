@@ -857,7 +857,11 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
             Settings.IsScreenRecordingModeEnabled: false
         };
         PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.ToolWindow, shouldUseToolWindow);
-        PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.Transparent | WindowFeatures.ClickThrough, !ViewModel.IsEditMode);
+
+        // 食谱面板显示期间要能点（关闭/缩放按钮），所以临时关掉鼠标穿透。
+        // 这里统一计算，避免设置变化时重新打开穿透把面板上的点击吃掉。
+        var clickThrough = !ViewModel.IsEditMode && !RecipeService.IsVisible;
+        PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.Transparent | WindowFeatures.ClickThrough, clickThrough);
         PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.Private, isCaptureBlocked);
     }
 
