@@ -14,7 +14,9 @@ public static partial class RecipeExcelReader
 {
     public static IReadOnlyList<RecipeDay> Read(string path)
     {
-        using var archive = ZipFile.OpenRead(path);
+        // Excel 打开的文件默认带写锁，这里用 ReadWrite 共享方式打开，避免用户在 Excel 里开着菜单时读不到。
+        using var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+        using var archive = new ZipArchive(fileStream, ZipArchiveMode.Read);
         var sharedStrings = ReadSharedStrings(archive);
         var sheetEntry = archive.Entries.FirstOrDefault(entry =>
             string.Equals(entry.FullName, "xl/worksheets/sheet1.xml", StringComparison.OrdinalIgnoreCase));
