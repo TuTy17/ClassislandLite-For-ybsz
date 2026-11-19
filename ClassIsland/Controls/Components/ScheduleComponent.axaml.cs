@@ -68,6 +68,8 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
     public IProfileService ProfileService { get; }
     public IExactTimeService ExactTimeService { get; }
 
+    public IWeatherService WeatherService { get; }
+
     public static readonly StyledProperty<int> LessonsListBoxSelectedIndexProperty = AvaloniaProperty.Register<ScheduleComponent, int>(
         nameof(LessonsListBoxSelectedIndex));
 
@@ -75,6 +77,14 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
     private IDisposable? _hideFinishedClassObserver;
     private IDisposable? _showEmptyPlaceholderObserver;
     private IDisposable? _carnivalModeObserver;
+    private readonly Avalonia.Threading.DispatcherTimer _tomorrowRefreshTimer = new()
+    {
+        Interval = TimeSpan.FromSeconds(1)
+    };
+    private string _tomorrowWeatherText = "";
+    private string _tomorrowRainHint = "";
+    private bool _hasTomorrowWeather;
+    private bool _isTomorrowRainy;
     private ObservableDictionary<Guid, Subject> _displaySubjects = new();
 
     private static readonly Subject CarnivalSubject = new()
@@ -127,22 +137,82 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
         }
     }
 
-    public ScheduleComponent(ILessonsService lessonsService, SettingsService settingsService, IProfileService profileService, IExactTimeService exactTimeService)
+    /// <summary>
+    /// 是否取到了明天的天气（有数据才显示在“明天”标签后面）。
+    /// </summary>
+    public bool HasTomorrowWeather
+    {
+        get => _hasTomorrowWeather;
+        private set
+        {
+            if (value == _hasTomorrowWeather) return;
+            _hasTomorrowWeather = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 明天天气的简要文字，例如“多云转小雨 8~15℃”。
+    /// </summary>
+    public string TomorrowWeatherText
+    {
+        get => _tomorrowWeatherText;
+        private set
+        {
+            if (value == _tomorrowWeatherText) return;
+            _tomorrowWeatherText = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 明天是否有雨雪，需要在“明天”标签后常驻一个醒目提示。
+    /// </summary>
+    public bool IsTomorrowRainy
+    {
+        get => _isTomorrowRainy;
+        private set
+        {
+            if (value == _isTomorrowRainy) return;
+            _isTomorrowRainy = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 雨雪提示文字，例如“明日有雨”。
+    /// </summary>
+    public string TomorrowRainHint
+    {
+        get => _tomorrowRainHint;
+        private set
+        {
+            if (value == _tomorrowRainHint) return;
+            _tomorrowRainHint = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ScheduleComponent(ILessonsService lessonsService, SettingsService settingsService, IProfileService profileService, IExactTimeService exactTimeService, IWeatherService weatherService)
     {
         LessonsService = lessonsService;
         SettingsService = settingsService;
         ProfileService = profileService;
         ExactTimeService = exactTimeService;
+        WeatherService = weatherService;
         
         AttachedToVisualTree += (_, _) => LessonsService.PostMainTimerTicked += LessonsServiceOnPostMainTimerTicked;
         AttachedToVisualTree += (_, _) => LessonsService.CurrentTimeStateChanged += OnLessonsServiceOnCurrentTimeStateChanged;
         AttachedToVisualTree += (_, _) => LessonsService.PropertyChanged += LessonsServiceOnPropertyChanged;
         AttachedToVisualTree += OnAttachedToVisualTree;
+        AttachedToVisualTree += (_, _) => _tomorrowRefreshTimer.Start();
+        DetachedFromVisualTree += (_, _) => _tomorrowRefreshTimer.Stop();
         DetachedFromVisualTree += (_, _) => LessonsService.PostMainTimerTicked -= LessonsServiceOnPostMainTimerTicked;
         DetachedFromVisualTree += (_, _) => LessonsService.CurrentTimeStateChanged -= OnLessonsServiceOnCurrentTimeStateChanged;
         DetachedFromVisualTree += (_, _) => LessonsService.PropertyChanged -= LessonsServiceOnPropertyChanged;
         DetachedFromVisualTree += OnDetachedFromVisualTree;
         InitializeComponent();
+        _tomorrowRefreshTimer.Tick += (_, _) => RefreshTomorrowState();
         RefreshDisplaySubjects();
         CurrentTimeStateChanged();
     }
@@ -174,6 +244,7 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
             {
                 HideFinishedClass = Settings.HideFinishedClass;
                 UpdateTomorrowVisibility();
+        UpdateTomorrowWeather();
             });
         _showEmptyPlaceholderObserver ??= Settings
             .ObservableForProperty(x => x.ShowPlaceholderOnEmptyClassPlan)
@@ -191,11 +262,37 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
         UpdateTomorrowVisibility();
     }
 
+    /// <summary>
+    /// 重新计算“明天的课表”。档案加载晚于组件创建时，TomorrowClassPlan 会一直是 null，
+    /// 导致“最后一节课显示次日课表”永远不触发，所以定时器每次 tick 都校对一遍。
+    /// </summary>
+    /// <summary>
+    /// 每秒校对一次“次日课表 / 最后一节课 / 次日天气”。
+    /// 课表档案可能晚于组件创建才加载完成，只依赖一次性初始化会一直显示不出来。
+    /// </summary>
+    private void RefreshTomorrowState()
+    {
+        RefreshTomorrowClassPlan();
+        UpdateLastLessonState();
+        UpdateTomorrowVisibility();
+        UpdateTomorrowWeather();
+    }
+
+    private void RefreshTomorrowClassPlan()
+    {
+        var tomorrow = LessonsService.GetClassPlanByDate(ExactTimeService.GetCurrentLocalDateTime() + TimeSpan.FromDays(1));
+        if (!Equals(TomorrowClassPlan, tomorrow))
+        {
+            TomorrowClassPlan = tomorrow;
+        }
+    }
+
     private void CheckTomorrowClassShowMode()
     {
         PseudoClasses.Set(":show-tomorrow-schedule", Settings.TomorrowScheduleShowMode is 1 or 2 or 3 or 4);
         PseudoClasses.Set(":show-tomorrow-schedule-after-school", Settings.TomorrowScheduleShowMode is 1 or 4);
         PseudoClasses.Set(":show-tomorrow-schedule-always", Settings.TomorrowScheduleShowMode is 2);
+        RefreshTomorrowClassPlan();
         UpdateLastLessonState();
         UpdateTomorrowVisibility();
     }
@@ -233,6 +330,7 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
 
     private void LessonsServiceOnPostMainTimerTicked(object? sender, EventArgs e)
     {
+        RefreshTomorrowState();
         var settingsSource =
             (ILessonControlSettings?)IAttachedSettingsHostService.GetAttachedSettingsByPriority<LessonControlAttachedSettings>(
                 new Guid("58e5b69a-764a-472b-bcf7-003b6a8c7fdf"),
@@ -269,27 +367,35 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
     private void UpdateLastLessonState()
     {
         var currentPlan = LessonsService.CurrentClassPlan;
-        var lessons = currentPlan?.Classes?
-            .Where(info => info.CurrentTimeLayoutItem is { TimeType: 0 } && info.SubjectId != Guid.Empty && !info.CurrentTimeLayoutItem.IsHideDefault)
-            .OrderBy(info => info.CurrentTimeLayoutItem.StartTime)
+        var items = currentPlan?.ValidTimeLayoutItems?
+            .Where(item => item.TimeType == 0 && !item.IsHideDefault)
             .ToList() ?? [];
-        var lastLesson = lessons.LastOrDefault();
+        var classes = currentPlan?.Classes?.ToList() ?? [];
         var now = ExactTimeService.GetCurrentLocalDateTime();
 
         // 最后一节课如果属于一组连续的同科目课程（重复课程分组），
         // 那么组内任意一节课都视为“最后一节课”，提前显示次日课表。
         var inLastLessonGroup = false;
-        if (lastLesson != null)
+        if (items.Count > 0)
         {
-            var groupStart = lessons.Count - 1;
-            while (groupStart > 0 && lessons[groupStart - 1].SubjectId == lastLesson.SubjectId)
+            var lastIndex = items.Count - 1;
+            var groupStart = lastIndex;
+            if (lastIndex < classes.Count)
             {
-                groupStart--;
+                var lastSubject = classes[lastIndex].SubjectId;
+                while (groupStart > 0 && groupStart - 1 < classes.Count && classes[groupStart - 1].SubjectId == lastSubject)
+                {
+                    groupStart--;
+                }
+            }
+            else
+            {
+                groupStart = lastIndex;
             }
 
-            for (var i = groupStart; i < lessons.Count; i++)
+            for (var i = groupStart; i <= lastIndex && i < items.Count; i++)
             {
-                var item = lessons[i].CurrentTimeLayoutItem;
+                var item = items[i];
                 if (now.TimeOfDay >= item.StartTime && now.TimeOfDay <= item.EndTime)
                 {
                     inLastLessonGroup = true;
@@ -302,6 +408,73 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
 
         ShowCurrentLessonOnlyOnClass = _showCurrentLessonOnlyFromSettings || _isLastLessonPeriod;
         PseudoClasses.Set(":show-tomorrow-schedule-at-last-class", _isLastLessonPeriod);
+    }
+
+    /// <summary>
+    /// 取“明天”的天气：按日出日落数据里的日期定位明天，避免不同接口起始日不一致。
+    /// </summary>
+    private void UpdateTomorrowWeather()
+    {
+        try
+        {
+            var daily = WeatherService?.LastWeatherInfo?.ForecastDaily;
+            var temperatures = daily?.Temperature?.Value;
+            var weathers = daily?.Weather?.Value;
+            if (temperatures == null || weathers == null || temperatures.Count == 0 || weathers.Count == 0)
+            {
+                HasTomorrowWeather = false;
+                IsTomorrowRainy = false;
+                return;
+            }
+
+            var tomorrow = ExactTimeService.GetCurrentLocalDateTime().Date.AddDays(1);
+            var index = -1;
+            var sunSets = daily?.SunRiseSet?.Value;
+            if (sunSets != null)
+            {
+                for (var i = 0; i < sunSets.Count; i++)
+                {
+                    if (DateTimeOffset.TryParse(sunSets[i].From, out var date) && date.Date == tomorrow)
+                    {
+                        index = i;
+                        break;
+                    }
+                }
+            }
+
+            if (index < 0 || index >= temperatures.Count || index >= weathers.Count)
+            {
+                index = Math.Min(1, Math.Min(temperatures.Count, weathers.Count) - 1);
+            }
+
+            if (index < 0)
+            {
+                HasTomorrowWeather = false;
+                IsTomorrowRainy = false;
+                return;
+            }
+
+            var temperature = temperatures[index];
+            var weather = weathers[index];
+            var textFrom = WeatherService.GetWeatherTextByCode(weather.From);
+            var textTo = WeatherService.GetWeatherTextByCode(weather.To);
+            var weatherText = textFrom == textTo ? textFrom : $"{textFrom}转{textTo}";
+            var low = int.TryParse(temperature.To, out var lowValue) ? lowValue : (int?)null;
+            var high = int.TryParse(temperature.From, out var highValue) ? highValue : (int?)null;
+            var temperatureText = low.HasValue && high.HasValue ? $" {low}~{high}℃" : "";
+
+            TomorrowWeatherText = weatherText + temperatureText;
+            HasTomorrowWeather = !string.IsNullOrWhiteSpace(weatherText);
+            IsTomorrowRainy = weatherText.Contains('雨') || weatherText.Contains('雪') || weatherText.Contains('雷');
+            TomorrowRainHint = weatherText.Contains('雪') ? "明日有雪"
+                : weatherText.Contains('雷') ? "明日有雷"
+                : "明日有雨";
+        }
+        catch
+        {
+            HasTomorrowWeather = false;
+            IsTomorrowRainy = false;
+        }
     }
 
     private void UpdateTomorrowVisibility()

@@ -100,8 +100,19 @@
             Padding="8 2"
             CornerRadius="16"
             x:Name="Tomorrow">
-            <TextBlock Text="明天" Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
-                       Margin="0,1,0,-1"/>
+            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <TextBlock Text="明天" Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
+                           Margin="0,1,0,-1" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding TomorrowWeatherText}"
+                           IsVisible="{Binding HasTomorrowWeather}"
+                           Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
+                           Margin="0,1,0,-1" VerticalAlignment="Center"/>
+                <Border Background="#FFD64545" CornerRadius="10" Padding="7,1"
+                        IsVisible="{Binding IsTomorrowRainy}" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding TomorrowRainHint}" FontSize="12" FontWeight="SemiBold"
+                               Foreground="White"/>
+                </Border>
+            </StackPanel>
         </Border>
         <ci:LessonsListBox Grid.Column="0" 
                            Subjects="{Binding DisplaySubjects, Mode=OneWay}"

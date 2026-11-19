@@ -2,6 +2,8 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.VisualTree;
+using ClassIsland.Core.Controls;
 using ClassIsland.Core.Abstractions.Controls;
 using ClassIsland.Core.Abstractions.Services;
 using ClassIsland.Core.Attributes;
@@ -71,17 +73,44 @@ public partial class DecibelComponent : ComponentBase, INotifyPropertyChanged
                      _settingsService.Settings.DecibelVisibleLessonKeys.Contains(
                          LessonTimePointHelper.CreateKey(plan.TimeLayoutId, item));
 
-        // 不在显示时段时不能只把控件本身设成不可见：组件宿主会保留最后宽度并显示占位方块。
-        // 这里让内容折叠、控件尺寸归零，宿主在组件行里就不会留下空方块。
+        // 不在显示时段时整个组件（含宿主占位方块）都要收起来：
+        // 只隐藏控件本身时，宿主会用“上次宽度”画一个空方块，所以顺手把缓存宽度清零。
         if (Content is Control content)
         {
             content.IsVisible = active;
         }
 
+        IsVisible = active;
         Width = active ? double.NaN : 0;
         Height = active ? double.NaN : 0;
         Opacity = active ? 1 : 0;
         IsHitTestVisible = active;
+
+        if (!active)
+        {
+            ResetPresenterWidthCache();
+        }
+        else
+        {
+            OnPropertyChanged(nameof(CurrentDecibelText));
+        }
+    }
+
+    /// <summary>
+    /// 把组件宿主的“上次宽度”清零，避免隐藏后在主界面上留一个空方块。
+    /// </summary>
+    private void ResetPresenterWidthCache()
+    {
+        var parent = this.GetVisualParent();
+        while (parent != null && parent is not ComponentPresenter)
+        {
+            parent = parent.GetVisualParent();
+        }
+
+        if (parent is ComponentPresenter { Settings: { } settings })
+        {
+            settings.LastWidthCache = 0;
+        }
     }
 
     private void DecibelServiceOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
