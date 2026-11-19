@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -33,9 +34,24 @@ public class TaskBarIconService : IHostedService, ITaskBarIconService
         get;
     } = new()
     {
-        Icon = new WindowIcon(OperatingSystem.IsMacOS() ? "../Resources/Assets/AppLogo_Monochrome.png" : "Assets/AppLogo.png"),
+        Icon = new WindowIcon(ResolveIconPath()),
         ToolTipText = "ClassIsland Lite"
     };
+
+    /// <summary>
+    /// 托盘图标按程序所在目录解析。启动器的工作目录和程序目录可能不同，用相对路径会取不到图标而显示成旧图标。
+    /// </summary>
+    private static string ResolveIconPath()
+    {
+        var fileName = OperatingSystem.IsMacOS() ? "AppLogo_Monochrome.png" : "AppLogo.png";
+        if (OperatingSystem.IsMacOS())
+        {
+            return Path.Combine("..", "Resources", "Assets", fileName);
+        }
+
+        var absolute = Path.Combine(AppContext.BaseDirectory, "Assets", fileName);
+        return File.Exists(absolute) ? absolute : Path.Combine("Assets", fileName);
+    }
 
     public IList<NativeMenuItemBase> MoreOptionsMenuItems => MoreOptionsMenu!.Items;
     
