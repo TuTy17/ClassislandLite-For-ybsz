@@ -1,0 +1,43 @@
+<Window x:Class="ClassIsland.Views.RemoteMessageWindow"
+        xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="远程提醒"
+        WindowStartupLocation="CenterScreen"
+        WindowState="FullScreen"
+        SystemDecorations="None"
+        ShowInTaskbar="False"
+        Topmost="True"
+        CanResize="False"
+        Width="1440"
+        Height="900"
+        Background="#E6101216">
+    <Grid x:Name="Root" Background="Transparent">
+        <StackPanel HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    MaxWidth="1200"
+                    Margin="80,0">
+            <TextBlock Text="校园提醒"
+                       HorizontalAlignment="Center"
+                       Foreground="#8FB7FF"
+                       FontSize="30"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,26" />
+            <TextBlock x:Name="MessageText"
+                       Text=""
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="White"
+                       FontWeight="Bold"
+                       FontSize="96" />
+            <TextBlock Text="点击任意位置关闭"
+                       HorizontalAlignment="Center"
+                       Foreground="#88FFFFFF"
+                       FontSize="20"
+                       Margin="0,48,0,0" />
+        </StackPanel>
+    </Grid>
+</Window>

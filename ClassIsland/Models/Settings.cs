@@ -221,6 +221,13 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
     private bool _isNonExactCountdownEnabled = false;
     private bool _showDetailedStatusOnSplash = false;
     private bool _isCarnivalModeEnabled = false;
+    private bool _isRemoteMessageEnabled = false;
+    private string _remoteMessageServerUrl = "";
+    private string _remoteMessageAccessKey = "";
+    private string _remoteMessageDeviceId = "";
+    private int _remoteMessagePollSeconds = 5;
+    private double _remoteMessageSoundVolume = 0.8;
+    private long _remoteMessageLastId = 0;
     private bool _isRecipePreviewEnabled = false;
     private string _recipeWorkbookPath = "";
     private ObservableCollection<string> _recipeLunchTriggerLessonKeys = [];
@@ -2717,6 +2724,109 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         {
             if (Equals(value, _recipeDinnerTriggerLessonKeys)) return;
             _recipeDinnerTriggerLessonKeys = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 是否启用来自服务器的全屏提醒消息。
+    /// </summary>
+    public bool IsRemoteMessageEnabled
+    {
+        get => _isRemoteMessageEnabled;
+        set
+        {
+            if (value == _isRemoteMessageEnabled) return;
+            _isRemoteMessageEnabled = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 消息服务器地址，例如 https://classisland-msg.example.workers.dev。
+    /// </summary>
+    public string RemoteMessageServerUrl
+    {
+        get => _remoteMessageServerUrl;
+        set
+        {
+            value ??= "";
+            if (value == _remoteMessageServerUrl) return;
+            _remoteMessageServerUrl = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 设备访问密钥，与服务器上配置的 DEVICE_KEY 一致。
+    /// </summary>
+    public string RemoteMessageAccessKey
+    {
+        get => _remoteMessageAccessKey;
+        set
+        {
+            value ??= "";
+            if (value == _remoteMessageAccessKey) return;
+            _remoteMessageAccessKey = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 本机设备标识，首次启动时自动生成。
+    /// </summary>
+    public string RemoteMessageDeviceId
+    {
+        get => _remoteMessageDeviceId;
+        set
+        {
+            value ??= "";
+            if (value == _remoteMessageDeviceId) return;
+            _remoteMessageDeviceId = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 轮询间隔（秒）。
+    /// </summary>
+    public int RemoteMessagePollSeconds
+    {
+        get => _remoteMessagePollSeconds;
+        set
+        {
+            value = Math.Clamp(value, 2, 120);
+            if (value == _remoteMessagePollSeconds) return;
+            _remoteMessagePollSeconds = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 提醒音效音量（0-1），默认 0.8。
+    /// </summary>
+    public double RemoteMessageSoundVolume
+    {
+        get => _remoteMessageSoundVolume;
+        set
+        {
+            value = Math.Clamp(value, 0, 1);
+            if (value.Equals(_remoteMessageSoundVolume)) return;
+            _remoteMessageSoundVolume = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 已接收到的最后一条消息 ID，用于避免重复提醒。
+    /// </summary>
+    public long RemoteMessageLastId
+    {
+        get => _remoteMessageLastId;
+        set
+        {
+            if (value == _remoteMessageLastId) return;
+            _remoteMessageLastId = value;
             OnPropertyChanged();
         }
     }

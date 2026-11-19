@@ -733,6 +733,7 @@ public partial class App : AppBase, IAppHost
         GetService<IWeatherService>();
         GetService<RecipeService>().Initialize();
         GetService<QqNotificationMirrorService>().Initialize();
+        GetService<RemoteMessageService>().Initialize();
         
         if (ApplicationCommand.Diagnostic)
         {

@@ -118,6 +118,7 @@ public partial class App
         services.AddTransient<ExperimentalSettingsViewModel>();
         services.AddTransient<DecibelSettingsViewModel>();
         services.AddTransient<VersionRollbackSettingsViewModel>();
+        services.AddTransient<RemoteMessageSettingsViewModel>();
         // Views
         services.AddTransient<ITopmostEffectPlayer>(x => x.GetRequiredService<TopmostEffectWindow>());
         services.AddSingleton<MainWindow>();
@@ -170,6 +171,7 @@ public partial class App
         services.AddSettingsPage<ExperimentalSettingsPage>();
         services.AddSettingsPage<DecibelSettingsPage>();
         services.AddSettingsPage<VersionRollbackSettingsPage>();
+        services.AddSettingsPage<RemoteMessageSettingsPage>();
         // 主界面组件
         services.AddComponent<TextComponent, TextComponentSettingsControl>();
         services.AddComponent<SeparatorComponent>();
@@ -188,6 +190,7 @@ public partial class App
         services.AddSingleton<RecipeService>();
         services.AddSingleton<DecibelService>();
         services.AddSingleton<QqNotificationMirrorService>();
+        services.AddSingleton<RemoteMessageService>();
         // 天气相关
         services.AddAttachedSettingsControl<WeatherNotificationAttachedSettingsControl>();
         services.AddRule<CurrentWeatherRuleSettings, CurrentWeatherRuleSettingsControl>("classisland.weather.currentWeather", "当前天气是", "\uE4DC");
