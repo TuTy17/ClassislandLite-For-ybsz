@@ -1,7 +1,5 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
 using ClassIsland.Core.Abstractions.Controls;
 using ClassIsland.Core.Attributes;
 using ClassIsland.Core.Enums.SettingsWindow;
@@ -36,13 +34,4 @@ public partial class RemoteMessageSettingsPage : SettingsPageBase
         ViewModel.RemoteMessageService.ShowLocalPreview("这是一条远程提醒的预览消息，下课后来办公室一趟。");
     }
 
-    private async void ButtonCopyDeviceId_OnClick(object? sender, RoutedEventArgs e)
-    {
-        var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
-        if (clipboard != null)
-        {
-            await clipboard.SetTextAsync(ViewModel.SettingsService.Settings.RemoteMessageDeviceId);
-            ViewModel.StatusMessage = "设备标识已复制。";
-        }
-    }
 }

@@ -41,17 +41,6 @@
                                  Width="380" />
                     </ui:SettingsExpanderItem.Footer>
                 </ui:SettingsExpanderItem>
-                <ui:SettingsExpanderItem Content="本机设备标识"
-                                         Description="要做“只发给某一台设备”时，把它填到网页端。">
-                    <ui:SettingsExpanderItem.Footer>
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="{Binding ViewModel.SettingsService.Settings.RemoteMessageDeviceId}"
-                                       VerticalAlignment="Center"
-                                       Classes="l-secondary" />
-                            <Button Content="复制" Click="ButtonCopyDeviceId_OnClick" />
-                        </StackPanel>
-                    </ui:SettingsExpanderItem.Footer>
-                </ui:SettingsExpanderItem>
                 <ui:SettingsExpanderItem Content="轮询间隔"
                                          Description="越短越及时，机器多时可以调大一点。">
                     <ui:SettingsExpanderItem.Footer>

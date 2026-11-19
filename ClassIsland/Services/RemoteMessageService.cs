@@ -50,7 +50,6 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
     public void Initialize()
     {
         _initialized = true;
-        EnsureDeviceId();
         RestartTimer();
     }
 
@@ -88,19 +87,6 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
             or nameof(Settings.RemoteMessagePollSeconds))
         {
             RestartTimer();
-        }
-
-        if (e.PropertyName is nameof(Settings.RemoteMessageDeviceId))
-        {
-            EnsureDeviceId();
-        }
-    }
-
-    private void EnsureDeviceId()
-    {
-        if (string.IsNullOrWhiteSpace(_settingsService.Settings.RemoteMessageDeviceId))
-        {
-            _settingsService.Settings.RemoteMessageDeviceId = Guid.NewGuid().ToString("N");
         }
     }
 
@@ -187,8 +173,8 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
         }
 
         var after = settings.RemoteMessageLastId;
-        var url = $"{baseUrl}/api/messages?after={after}&device={Uri.EscapeDataString(settings.RemoteMessageDeviceId)}" +
-                  $"&key={Uri.EscapeDataString(settings.RemoteMessageAccessKey)}";
+        // 广播模式：所有设备拉取同一批消息，各自用 lastId 去重。
+        var url = $"{baseUrl}/api/messages?after={after}&key={Uri.EscapeDataString(settings.RemoteMessageAccessKey)}";
         using var response = await _httpClient.GetAsync(url);
         if (!response.IsSuccessStatusCode)
         {
