@@ -107,7 +107,7 @@
                            IsVisible="{Binding HasTomorrowWeather}"
                            Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
                            Margin="0,1,0,-1" VerticalAlignment="Center"/>
-                <Border Background="#FFD64545" CornerRadius="10" Padding="7,1"
+                <Border Background="#33FFFFFF" CornerRadius="10" Padding="7,1"
                         IsVisible="{Binding IsTomorrowRainy}" VerticalAlignment="Center">
                     <TextBlock Text="{Binding TomorrowRainHint}" FontSize="12" FontWeight="SemiBold"
                                Foreground="White"/>
