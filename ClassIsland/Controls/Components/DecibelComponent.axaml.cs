@@ -86,20 +86,19 @@ public partial class DecibelComponent : ComponentBase, INotifyPropertyChanged
         Opacity = active ? 1 : 0;
         IsHitTestVisible = active;
 
-        if (!active)
-        {
-            ResetPresenterWidthCache();
-        }
-        else
+        SetPresenterVisibility(active);
+
+        if (active)
         {
             OnPropertyChanged(nameof(CurrentDecibelText));
         }
     }
 
     /// <summary>
-    /// 把组件宿主的“上次宽度”清零，避免隐藏后在主界面上留一个空方块。
+    /// 不在显示时段时，把组件宿主（ComponentPresenter）本身设为不可见。
+    /// 只隐藏控件本身不够：宿主会保留占位，主界面这一行仍会画出背景方块。
     /// </summary>
-    private void ResetPresenterWidthCache()
+    private void SetPresenterVisibility(bool active)
     {
         var parent = this.GetVisualParent();
         while (parent != null && parent is not ComponentPresenter)
@@ -107,9 +106,13 @@ public partial class DecibelComponent : ComponentBase, INotifyPropertyChanged
             parent = parent.GetVisualParent();
         }
 
-        if (parent is ComponentPresenter { Settings: { } settings })
+        if (parent is ComponentPresenter presenter)
         {
-            settings.LastWidthCache = 0;
+            presenter.IsVisibleInternal = active;
+            if (presenter.Settings is { } settings)
+            {
+                settings.LastWidthCache = active ? settings.LastWidthCache : 0;
+            }
         }
     }
 
