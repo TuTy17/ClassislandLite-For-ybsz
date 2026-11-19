@@ -2,7 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using ClassIsland.Core.Abstractions.Services;
-using ClassIsland.Helpers;
+using System.Collections.Generic;
 using ClassIsland.Models;
 using ClassIsland.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -36,66 +36,45 @@ public sealed class ExperimentalSettingsViewModel : ObservableRecipient
     }
 
     /// <summary>
-    /// 按当前档案重建午餐/晚餐触发课程列表（支持多选）。
+    /// 按当前档案重建午餐/晚餐触发课程列表（支持多选，单周/双周自动合并）。
     /// </summary>
     public void RefreshLessonChoices()
     {
         LunchGroups.Clear();
         DinnerGroups.Clear();
 
-        foreach (var (layoutId, layout) in _profileService.Profile.TimeLayouts.OrderBy(pair => pair.Value.Name))
+        var settings = SettingsService.Settings;
+        foreach (var group in LessonChoiceBuilder.Build(
+                     _profileService,
+                     key => settings.RecipeLunchTriggerLessonKeys.Contains(key),
+                     (keys, selected) => Toggle(settings.RecipeLunchTriggerLessonKeys, keys, selected)))
         {
-            var lunchGroup = new LessonTimePointGroup { Name = layout.Name };
-            var dinnerGroup = new LessonTimePointGroup { Name = layout.Name };
-            var lessonNumber = 0;
-            foreach (var item in layout.Layouts.Where(item => item.TimeType == 0))
-            {
-                lessonNumber++;
-                var key = LessonTimePointHelper.CreateKey(layoutId, item);
-                var shortName = $"第 {lessonNumber} 节";
-                var timeText = LessonTimePointHelper.FormatRange(item.StartTime, item.EndTime);
+            LunchGroups.Add(group);
+        }
 
-                lunchGroup.Items.Add(new LessonTimePointChoice
-                {
-                    Key = key,
-                    DisplayName = $"{layout.Name} · {shortName} · {timeText}",
-                    ShortName = shortName,
-                    TimeText = timeText,
-                    GroupName = layout.Name,
-                    IsSelected = SettingsService.Settings.RecipeLunchTriggerLessonKeys.Contains(key),
-                    SelectionChanged = (choice, selected) => Toggle(SettingsService.Settings.RecipeLunchTriggerLessonKeys, choice.Key, selected)
-                });
-                dinnerGroup.Items.Add(new LessonTimePointChoice
-                {
-                    Key = key,
-                    DisplayName = $"{layout.Name} · {shortName} · {timeText}",
-                    ShortName = shortName,
-                    TimeText = timeText,
-                    GroupName = layout.Name,
-                    IsSelected = SettingsService.Settings.RecipeDinnerTriggerLessonKeys.Contains(key),
-                    SelectionChanged = (choice, selected) => Toggle(SettingsService.Settings.RecipeDinnerTriggerLessonKeys, choice.Key, selected)
-                });
-            }
-
-            if (lunchGroup.Items.Count > 0)
-            {
-                LunchGroups.Add(lunchGroup);
-                DinnerGroups.Add(dinnerGroup);
-            }
+        foreach (var group in LessonChoiceBuilder.Build(
+                     _profileService,
+                     key => settings.RecipeDinnerTriggerLessonKeys.Contains(key),
+                     (keys, selected) => Toggle(settings.RecipeDinnerTriggerLessonKeys, keys, selected)))
+        {
+            DinnerGroups.Add(group);
         }
 
         OnPropertyChanged(nameof(HasRecipeLessonChoices));
     }
 
-    private static void Toggle(ObservableCollection<string> keys, string key, bool selected)
+    private static void Toggle(ObservableCollection<string> selectedKeys, IReadOnlyList<string> keys, bool selected)
     {
-        if (selected && !keys.Contains(key))
+        foreach (var key in keys)
         {
-            keys.Add(key);
-        }
-        else if (!selected)
-        {
-            keys.Remove(key);
+            if (selected && !selectedKeys.Contains(key))
+            {
+                selectedKeys.Add(key);
+            }
+            else if (!selected)
+            {
+                selectedKeys.Remove(key);
+            }
         }
     }
 }

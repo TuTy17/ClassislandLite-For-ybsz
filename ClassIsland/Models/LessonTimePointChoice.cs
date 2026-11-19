@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -9,6 +10,11 @@ public sealed class LessonTimePointChoice : ObservableRecipient
     private bool _isSelected;
 
     public required string Key { get; init; }
+
+    /// <summary>
+    /// 该课程对应的所有时间点键（单周/双周合并时会有多个）。
+    /// </summary>
+    public IReadOnlyList<string> Keys { get; init; } = [];
     public required string DisplayName { get; init; }
 
     /// <summary>
@@ -48,6 +54,6 @@ public sealed class LessonTimePointChoice : ObservableRecipient
 /// </summary>
 public sealed class LessonTimePointGroup
 {
-    public required string Name { get; init; }
+    public required string Name { get; set; }
     public ObservableCollection<LessonTimePointChoice> Items { get; } = [];
 }

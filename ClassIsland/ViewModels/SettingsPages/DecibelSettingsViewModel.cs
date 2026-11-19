@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -43,52 +44,42 @@ public sealed class DecibelSettingsViewModel : ObservableRecipient
 
     /// <summary>
     /// 按当前档案重建“小组件显示时段”列表。设置页可能被缓存，档案里的时间表变化后需要重新读取。
+    /// 单周/双周的同名时间表会自动合并成一组，勾选一节同时作用于两份时间表。
     /// </summary>
     public void RefreshLessonChoices()
     {
         VisibilityGroups.Clear();
         VisibilityLessonChoices.Clear();
 
-        foreach (var (layoutId, layout) in _profileService.Profile.TimeLayouts.OrderBy(pair => pair.Value.Name))
+        var settings = SettingsService.Settings;
+        foreach (var group in LessonChoiceBuilder.Build(
+                     _profileService,
+                     key => settings.DecibelVisibleLessonKeys.Contains(key),
+                     (keys, selected) => Toggle(keys, selected)))
         {
-            var group = new LessonTimePointGroup { Name = layout.Name };
-            var lessonNumber = 0;
-            foreach (var item in layout.Layouts.Where(item => item.TimeType == 0))
+            VisibilityGroups.Add(group);
+            foreach (var choice in group.Items)
             {
-                lessonNumber++;
-                var key = LessonTimePointHelper.CreateKey(layoutId, item);
-                var shortName = $"第 {lessonNumber} 节";
-                var choice = new LessonTimePointChoice
-                {
-                    Key = key,
-                    DisplayName = $"{layout.Name} · {shortName} · {LessonTimePointHelper.FormatRange(item.StartTime, item.EndTime)}",
-                    ShortName = shortName,
-                    TimeText = LessonTimePointHelper.FormatRange(item.StartTime, item.EndTime),
-                    GroupName = layout.Name,
-                    IsSelected = SettingsService.Settings.DecibelVisibleLessonKeys.Contains(key),
-                    SelectionChanged = (changed, selected) =>
-                    {
-                        if (selected && !SettingsService.Settings.DecibelVisibleLessonKeys.Contains(changed.Key))
-                        {
-                            SettingsService.Settings.DecibelVisibleLessonKeys.Add(changed.Key);
-                        }
-                        else if (!selected)
-                        {
-                            SettingsService.Settings.DecibelVisibleLessonKeys.Remove(changed.Key);
-                        }
-                    }
-                };
-                group.Items.Add(choice);
                 VisibilityLessonChoices.Add(choice);
-            }
-
-            if (group.Items.Count > 0)
-            {
-                VisibilityGroups.Add(group);
             }
         }
 
         OnPropertyChanged(nameof(HasVisibilityLessonChoices));
+    }
+
+    private void Toggle(IReadOnlyList<string> keys, bool selected)
+    {
+        foreach (var key in keys)
+        {
+            if (selected && !SettingsService.Settings.DecibelVisibleLessonKeys.Contains(key))
+            {
+                SettingsService.Settings.DecibelVisibleLessonKeys.Add(key);
+            }
+            else if (!selected)
+            {
+                SettingsService.Settings.DecibelVisibleLessonKeys.Remove(key);
+            }
+        }
     }
 
     public async System.Threading.Tasks.Task RefreshDevicesAsync()
