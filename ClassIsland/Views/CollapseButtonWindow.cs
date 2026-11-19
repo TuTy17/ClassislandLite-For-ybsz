@@ -27,7 +27,7 @@ public sealed class CollapseButtonWindow : Window
         Background = Brushes.Transparent;
         TransparencyBackgroundFallback = Brushes.Transparent;
         TransparencyLevelHint = [WindowTransparencyLevel.Transparent];
-        Title = "Classisland Lite - Collapse Button";
+        Title = "ClassIsland Lite - Collapse Button";
 
         var hitArea = new Border
         {

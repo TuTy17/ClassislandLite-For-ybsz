@@ -1,5 +1,5 @@
 ----------------------------------------------
-        Classisland Lite by Yu
+        ClassIsland Lite
    Maintained by Huang Yanyu (黄燕煜)
    Based on the open-source ClassIsland
 ----------------------------------------------

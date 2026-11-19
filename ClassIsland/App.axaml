@@ -10,7 +10,7 @@
          Name="ClassIsland">
     <NativeMenu.Menu>
         <NativeMenu>
-            <NativeMenuItem Header="关于 Classisland Lite by Yu…" Click="NativeMenuItemOpenAbout_OnClick"/>
+            <NativeMenuItem Header="关于 ClassIsland Lite…" Click="NativeMenuItemOpenAbout_OnClick"/>
         </NativeMenu>
     </NativeMenu.Menu>
     <ci:AppBase.Styles>

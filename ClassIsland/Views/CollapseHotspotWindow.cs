@@ -31,7 +31,7 @@ public sealed class CollapseHotspotWindow : Window
         TransparencyBackgroundFallback = Brushes.Transparent;
         TransparencyLevelHint = [WindowTransparencyLevel.Transparent];
         Opacity = 0.22;
-        Title = "Classisland Lite - Collapse Hotspot";
+        Title = "ClassIsland Lite - Collapse Hotspot";
 
         _buttonStrip = new Border
         {

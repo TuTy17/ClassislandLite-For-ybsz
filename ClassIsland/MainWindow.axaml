@@ -44,12 +44,13 @@
         </Transitions>
     </Window.Transitions>
     <Window.Resources>
+        <converters:MultiplyDoubleConverter x:Key="MultiplyDoubleConverter" />
         <converters1:IndexConverter x:Key="IndexConverter" />
         <converters1:ColorToColorPickerBrushConverter x:Key="ColorToColorPickerBrushConverter"/>
         <profile:ClassPlan x:Key="FallbackClassPlan"/>
         
         <NativeMenu x:Key="AppMenu">
-            <NativeMenuItem Header="Classisland Lite by Yu" Click="MenuItemAbout_OnClick">
+            <NativeMenuItem Header="ClassIsland Lite" Click="MenuItemAbout_OnClick">
                 <NativeMenuItem.Icon>
                     <OnPlatform Default="Assets/AppLogo.png">
                         <On Content="{x:Null}" Options="macOS"/>
@@ -155,12 +156,12 @@
             <Setter Property="CanResize" Value="False"/>
             <Setter Property="CanMaximize" Value="False"/>
             <Setter Property="CanMinimize" Value="False"/>
-            <Setter Property="Title" Value="Classisland Lite by Yu"/>
+            <Setter Property="Title" Value="ClassIsland Lite"/>
         </Style>
         <Style Selector=":is(Window):edit-mode">
             <Setter Property="Background" Value="{DynamicResource SmokeFillColorDefaultBrush}"/>
             <Setter Property="TransparencyLevelHint" Value="AcrylicBlur, Transparent"/>
-            <Setter Property="Title" Value="编辑主界面 | Classisland Lite by Yu"/>
+            <Setter Property="Title" Value="编辑主界面 | ClassIsland Lite"/>
         </Style>
         <Style Selector=":is(Window):windowed">
             <Setter Property="SystemDecorations" Value="Full"/>
@@ -192,8 +193,7 @@
                     ShowZoomIndicator="True"
                     EnableGestureRotation="False"
                     TextElement.FontFamily="{Binding ViewModel.Settings.MainWindowFont, Mode=OneWay, Converter={StaticResource StringToFontFamilyConverter}}"
-                    TextElement.FontWeight="{Binding ViewModel.Settings.MainWindowFontWeight2, Converter={StaticResource IntToFontWeightConverter}}"
-                    IsVisible="{Binding !ViewModel.Settings.IsEntertainmentModeEnabled}">
+                    TextElement.FontWeight="{Binding ViewModel.Settings.MainWindowFontWeight2, Converter={StaticResource IntToFontWeightConverter}}">
             <Canvas x:Name="LayoutContainerGrid">
                 <Panel x:Name="WorkingRoot"
                        Canvas.Left="{Binding ViewModel.ActualClientBound.X}"
@@ -591,25 +591,13 @@
                 ZIndex="900"
                 TextElement.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
                 RenderTransformOrigin="0.5,0"
-                RenderTransform="scale(0.9,0.3)"
-                Classes.fullscreen="{Binding RecipeService.IsFullscreenForeground}">
+                RenderTransform="scale(0.9,0.3)">
             <Border.Transitions>
                 <Transitions>
                     <DoubleTransition Property="Opacity" Duration="0:0:0.16" />
                     <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.28" Easing="CubicEaseOut" />
                 </Transitions>
             </Border.Transitions>
-            <Border.Styles>
-                <Style Selector="Border#RecipeMainOverlay.fullscreen TextBlock.recipe-title">
-                    <Setter Property="FontSize" Value="28" />
-                </Style>
-                <Style Selector="Border#RecipeMainOverlay.fullscreen TextBlock.recipe-value">
-                    <Setter Property="FontSize" Value="22" />
-                </Style>
-                <Style Selector="Border#RecipeMainOverlay.fullscreen TextBlock.recipe-label">
-                    <Setter Property="FontSize" Value="18" />
-                </Style>
-            </Border.Styles>
             <Grid>
                 <!-- 背景层：与课表条一致，只让背景按主界面不透明度半透明，文字保持不透明 -->
                 <Border x:Name="RecipeCard" Background="{DynamicResource SolidBackgroundFillColorSecondaryBrush}"
@@ -623,7 +611,7 @@
                         <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                             <TextBlock Classes="recipe-title"
                                        Text="{Binding RecipeService.Title}"
-                                       FontSize="{DynamicResource MainWindowLargeFontSize}"
+                                       FontSize="{Binding ViewModel.Settings.RecipeScale, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=20}"
                                        FontWeight="Bold"
                                        VerticalAlignment="Center" />
                             <Border Background="{DynamicResource AccentFillColorDefaultBrush}"
@@ -632,17 +620,32 @@
                                     VerticalAlignment="Center">
                                 <TextBlock Text="{Binding RecipeService.SubTitle}"
                                            Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
-                                           FontSize="{DynamicResource MainWindowSecondaryFontSize}" />
+                                           FontSize="{Binding ViewModel.Settings.RecipeScale, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=14}" />
                             </Border>
                         </StackPanel>
-                        <Button Grid.Column="1"
-                                Content="&#x2715;"
-                                Theme="{StaticResource TransparentButton}"
-                                Width="30"
-                                Height="30"
-                                FontSize="14"
-                                VerticalAlignment="Top"
-                                Click="ButtonCloseInlineRecipe_OnClick" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Top" ZIndex="10">
+                            <Button Content="&#x2212;"
+                                    Theme="{StaticResource TransparentButton}"
+                                    Width="28"
+                                    Height="28"
+                                    FontSize="14"
+                                    ToolTip.Tip="缩小食谱界面"
+                                    Click="ButtonRecipeZoomOut_OnClick" />
+                            <Button Content="&#x002B;"
+                                    Theme="{StaticResource TransparentButton}"
+                                    Width="28"
+                                    Height="28"
+                                    FontSize="14"
+                                    ToolTip.Tip="放大食谱界面"
+                                    Click="ButtonRecipeZoomIn_OnClick" />
+                            <Button Content="&#x2715;"
+                                    Theme="{StaticResource TransparentButton}"
+                                    Width="30"
+                                    Height="30"
+                                    FontSize="14"
+                                    ToolTip.Tip="关闭食谱"
+                                    Click="ButtonCloseInlineRecipe_OnClick" />
+                        </StackPanel>
                     </Grid>
                     <ScrollViewer Grid.Row="1"
                                   Margin="0,6,0,0"
@@ -666,13 +669,12 @@
                                             <TextBlock Classes="recipe-label"
                                                        Text="{Binding Name}"
                                                        Foreground="{DynamicResource TextOnAccentFillColorPrimaryBrush}"
-                                                       FontSize="{DynamicResource MainWindowSecondaryFontSize}" />
+                                                       FontSize="{Binding ViewModel.Settings.RecipeScale, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=14}" />
                                         </Border>
                                         <TextBlock Grid.Column="1"
                                                    Classes="recipe-value"
                                                    Text="{Binding ItemsText}"
-                                                   FontSize="{DynamicResource MainWindowBodyFontSize}"
-                                                   LineHeight="24"
+                                                   FontSize="{Binding ViewModel.Settings.RecipeScale, Converter={StaticResource MultiplyDoubleConverter}, ConverterParameter=16}"
                                                    TextWrapping="Wrap" />
                                     </Grid>
                                 </DataTemplate>
@@ -681,22 +683,6 @@
                     </ScrollViewer>
                 </Grid>
             </Grid>
-        </Border>
-
-        <Border x:Name="EntertainmentModeOverlay"
-                IsVisible="{Binding ViewModel.Settings.IsEntertainmentModeEnabled}"
-                Background="#FF101113"
-                ZIndex="1000">
-            <TextBlock Text="{Binding ViewModel.Settings.EntertainmentModeText}"
-                       Foreground="White"
-                       FontFamily="{Binding ViewModel.Settings.MainWindowFont, Converter={StaticResource StringToFontFamilyConverter}}"
-                       FontSize="{DynamicResource MainWindowLargeFontSize}"
-                       FontWeight="SemiBold"
-                       TextAlignment="Center"
-                       TextWrapping="Wrap"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Margin="32" />
         </Border>
 
         <Border IsVisible="{Binding QqNotificationMirrorService.IsMessageVisible}"

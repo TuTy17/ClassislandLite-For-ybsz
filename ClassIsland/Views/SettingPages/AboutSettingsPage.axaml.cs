@@ -39,7 +39,7 @@ namespace ClassIsland.Views.SettingPages;
 /// AboutSettingsPage.xaml 的交互逻辑
 /// </summary>
 [HidePageTitle]
-[SettingsPageInfo("about", "关于 Classisland Lite by Yu", "\ue9e4", "\ue9e3", SettingsPageCategory.About)]
+[SettingsPageInfo("about", "关于 ClassIsland Lite", "\ue9e4", "\ue9e3", SettingsPageCategory.About)]
 public partial class AboutSettingsPage : SettingsPageBase
 {
     public static string DisplayVersion => $"{AppBase.AppVersion} (Codename {AppBase.AppCodeName})";
@@ -230,7 +230,7 @@ public partial class AboutSettingsPage : SettingsPageBase
             var textBox = new TextBox();
             var textBlock = new TextBlock {
                 TextWrapping = TextWrapping.Wrap,
-                Text = "您正在 Classisland Lite by Yu 中启用仅供开发使用的调试菜单。请注意此功能仅限于开发和调试用途，维护者不对以非开发用途使用此页面中功能造成的任何后果负责，也不接受以非开发用途使用时产生的 Bug 的反馈。"+Environment.NewLine
+                Text = "您正在 ClassIsland Lite 中启用仅供开发使用的调试菜单。请注意此功能仅限于开发和调试用途，维护者不对以非开发用途使用此页面中功能造成的任何后果负责，也不接受以非开发用途使用时产生的 Bug 的反馈。"+Environment.NewLine
             };
             var timesBlockClicked = 0;
             textBlock.PointerPressed += (_,_) => {

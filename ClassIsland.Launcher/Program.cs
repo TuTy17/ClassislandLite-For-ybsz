@@ -22,7 +22,7 @@ if (OperatingSystem.IsWindows())
 }
 else
 {
-    ShowError("Classisland Lite by Yu 正在不支持的平台上运行，无法继续。");
+    ShowError("ClassIsland Lite 正在不支持的平台上运行，无法继续。");
     return 1;
 }
 
@@ -58,7 +58,7 @@ var installation = Directory.GetDirectories(root)
 
 if (installation == null)
 {
-    ShowError("找不到有效的 Classisland Lite by Yu 版本，可能是安装已损坏。");
+    ShowError("找不到有效的 ClassIsland Lite 版本，可能是安装已损坏。");
     return 1;
 }
 
@@ -97,7 +97,7 @@ void ShowError(string message)
 {
 #if Platforms_Windows
     PInvoke.MessageBox(HWND.Null, message,
-        "Classisland Lite by Yu", MESSAGEBOX_STYLE.MB_APPLMODAL | MESSAGEBOX_STYLE.MB_ICONSTOP);
+        "ClassIsland Lite", MESSAGEBOX_STYLE.MB_APPLMODAL | MESSAGEBOX_STYLE.MB_ICONSTOP);
 #else
     Console.Error.WriteLine(message);
 #endif

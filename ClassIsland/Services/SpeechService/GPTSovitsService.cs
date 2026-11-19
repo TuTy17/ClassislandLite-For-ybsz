@@ -123,7 +123,7 @@ public class GptSoVitsService : ISpeechService
             var sign = await pgp.SignAsync(JsonSerializer.Serialize(signData));
             httpClient.DefaultRequestHeaders.Add("X-ClassislandLite-ApiSignature", Convert.ToBase64String(Encoding.UTF8.GetBytes(sign)));
         }
-        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Classisland Lite by Yu", AppBase.AppVersion));
+        httpClient.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("ClassIsland Lite", AppBase.AppVersion));
         var serverIp = settings.GptSoVitsServerIp;
         var port = settings.GptSoVitsPort;
 

@@ -30,7 +30,7 @@ public partial class WelcomePage : UserControl, IWelcomePage
     {
         this.ShowToast(new ToastMessage()
         {
-            Title = "欢迎使用 Classisland Lite by Yu",
+            Title = "欢迎使用 ClassIsland Lite",
             Message = "本项目由黄燕煜维护开发，基于开源项目 ClassIsland。源代码基于 GPL-3.0 发布，上游仓库地址为 https://github.com/ClassIsland/ClassIsland/。如果您通过有偿协助等付费方式取得本应用，在遇到问题时请在与卖家约定的服务框架下，优先向卖家求助。如果卖家没有提供您预期的服务，请退款或通过其它形式积极维护您的合法权益。",
             AutoClose = false,
             Severity = InfoBarSeverity.Warning

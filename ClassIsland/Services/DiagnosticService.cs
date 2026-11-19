@@ -247,7 +247,7 @@ public class DiagnosticService(SettingsService settingsService, FileFolderServic
 
         DisableCorruptPlugins(plugins);
         var pluginsWarning = Environment.NewLine + Environment.NewLine +
-                             "此问题可能由以下插件引起，请在向 Classisland Lite by Yu 维护者反馈问题前先向以下插件的开发者反馈此问题：" + Environment.NewLine
+                             "此问题可能由以下插件引起，请在向 ClassIsland Lite 维护者反馈问题前先向以下插件的开发者反馈此问题：" + Environment.NewLine
                              + string.Join(Environment.NewLine,
                                  plugins.Select(x => $"- {x.Manifest.Name} [{x.Manifest.Id}]"));
         var message = $"""

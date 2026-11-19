@@ -1,0 +1,38 @@
+<UserControl x:Class="ClassIsland.Controls.LessonTimePointPicker"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:ClassIsland.Controls"
+             x:ClassModifier="public">
+    <ItemsControl ItemsSource="{Binding Groups, RelativeSource={RelativeSource AncestorType=local:LessonTimePointPicker}}">
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <StackPanel Spacing="4" Margin="0,0,0,10">
+                    <TextBlock Text="{Binding Name}" Classes="l-secondary" />
+                    <ItemsControl ItemsSource="{Binding Items}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <ToggleButton IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              Margin="0,0,6,6"
+                                              Padding="10,4"
+                                              VerticalContentAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <TextBlock Text="{Binding ShortName}" />
+                                        <TextBlock Text="{Binding TimeText}"
+                                                   FontSize="12"
+                                                   Opacity="0.7"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </ToggleButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

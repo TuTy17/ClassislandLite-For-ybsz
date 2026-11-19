@@ -144,9 +144,9 @@ public partial class WelcomeWindow : MyWindow, INavigationPageFactory
     [SupportedOSPlatform("windows")]
     private async Task CreateShortcutsWindows()
     {
-        var startupPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "Classisland Lite by Yu.lnk");
-        var startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Classisland Lite by Yu.lnk");
-        var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Classisland Lite by Yu.lnk");
+        var startupPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Startup), "ClassIsland Lite.lnk");
+        var startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "ClassIsland Lite.lnk");
+        var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "ClassIsland Lite.lnk");
         using var shortcut = new WindowsShortcut();
         shortcut.Path = AppBase.ExecutingEntrance;
         shortcut.WorkingDirectory = Path.GetDirectoryName(AppBase.ExecutingEntrance);
@@ -227,7 +227,7 @@ public partial class WelcomeWindow : MyWindow, INavigationPageFactory
         e.Cancel = true;
         var r = await new ContentDialog()
         {
-            Title = "退出 Classisland Lite by Yu",
+            Title = "退出 ClassIsland Lite",
             Content = "您需要完成设置才能开始使用本应用。关闭此窗口将直接退出应用。",
             PrimaryButtonText = "退出",
             SecondaryButtonText = "取消",

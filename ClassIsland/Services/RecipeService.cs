@@ -1,4 +1,4 @@
-using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -31,7 +31,6 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
     private string _subTitle = "";
     private string _content = "";
     private bool _isVisible;
-    private bool _isFullscreenForeground;
     private bool _isInitialized;
     private string _statusText = "尚未导入菜单";
 
@@ -39,15 +38,6 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
     public string SubTitle { get => _subTitle; private set => SetProperty(ref _subTitle, value); }
     public string Content { get => _content; private set => SetProperty(ref _content, value); }
     public bool IsVisible { get => _isVisible; private set => SetProperty(ref _isVisible, value); }
-
-    /// <summary>
-    /// 当前前台窗口是否处于全屏状态。全屏时食谱改为在主界面内放大显示并允许滚动。
-    /// </summary>
-    public bool IsFullscreenForeground
-    {
-        get => _isFullscreenForeground;
-        set => SetProperty(ref _isFullscreenForeground, value);
-    }
 
     public string StatusText { get => _statusText; private set => SetProperty(ref _statusText, value); }
     public ObservableCollection<RecipeSection> ActiveSections { get; } = [];
@@ -77,6 +67,7 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
         try
         {
             var result = await Task.Run(() => RecipeExcelReader.Read(path));
+            _logger.LogInformation("DumpDays: " + string.Join(",", result.Select(d => d.Month + "/" + d.Day)));
             StatusText = result.Count == 0
                 ? "Excel 中没有识别到午餐或晚餐"
                 : $"已识别 {result.Count} 天菜单";
@@ -210,8 +201,9 @@ public sealed class RecipeService : ObservableRecipient, IDisposable
         }
 
         var lessonKey = LessonTimePointHelper.CreateKey(plan.TimeLayoutId, previousClass);
-        var isLunch = lessonKey == _settingsService.Settings.RecipeLunchTriggerLessonKey;
-        var isDinner = lessonKey == _settingsService.Settings.RecipeDinnerTriggerLessonKey;
+        // 触发课程支持多选：同一时间点可以同时属于午餐和晚餐的触发集合。
+        var isLunch = _settingsService.Settings.RecipeLunchTriggerLessonKeys.Contains(lessonKey);
+        var isDinner = _settingsService.Settings.RecipeDinnerTriggerLessonKeys.Contains(lessonKey);
         if (!isLunch && !isDinner)
         {
             HideAll($"课程不匹配 {lessonKey}");

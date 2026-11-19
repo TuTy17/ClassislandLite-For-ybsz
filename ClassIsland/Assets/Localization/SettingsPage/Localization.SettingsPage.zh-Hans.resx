@@ -151,7 +151,7 @@
     <value>插件</value>
   </data>
   <data name="About_string" xml:space="preserve">
-    <value>关于 Classisland Lite by Yu</value>
+    <value>关于 ClassIsland Lite</value>
   </data>
   <data name="Theme_string" xml:space="preserve">
     <value>主题</value>
@@ -160,7 +160,7 @@
     <value>行为</value>
   </data>
   <data name="OpenSourceStatement" xml:space="preserve">
-    <value>Classisland Lite by Yu 是基于开源项目 ClassIsland 制作的免费软件，维护者为黄燕煜。本项目不提供任何形式的付费支持服务。上游源代码仓库地址在{sourcecodeurl}。</value>
+    <value>ClassIsland Lite 是基于开源项目 ClassIsland 制作的免费软件，维护者为黄燕煜。本项目不提供任何形式的付费支持服务。上游源代码仓库地址在{sourcecodeurl}。</value>
   </data>
   <data name="ExperimentalFeature_string" xml:space="preserve">
     <value>实验性功能</value>

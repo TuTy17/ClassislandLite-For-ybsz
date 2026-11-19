@@ -170,6 +170,8 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
 
     private List<object> TopmostLocks { get; } = [];
 
+    private const double RECIPE_PANEL_BASE_WIDTH = 560;
+    private const double RECIPE_PANEL_BASE_MAX_HEIGHT = 320;
     private bool _recipePanelAnimating;
     private double _recipePanelBottom;
     private double _recipePanelMaxHeight;
@@ -1699,28 +1701,9 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
 
     private void ShowRecipePanel()
     {
-        var fullscreen = ViewModel.IsForegroundFullscreen;
-        RecipeService.IsFullscreenForeground = fullscreen;
-        var availableWidth = Bounds.Width > 100 ? Bounds.Width - 96 : 1080;
-        var minimumWidth = fullscreen ? 620 : 460;
-        RecipeMainOverlay.Width = Math.Clamp(GetRecipePanelTargetWidth(), minimumWidth, Math.Max(minimumWidth, Math.Min(1100, availableWidth)));
-
-        if (fullscreen)
-        {
-            // 前台全屏：不额外弹窗，直接占用课表条的位置，空间不够时在面板内滚动。
-            RootLayoutTransformControl.IsVisible = false;
-            _recipePanelMargin = new Thickness(0, 6, 0, 0);
-            _recipePanelMaxHeight = Math.Max(220, Bounds.Height * 0.42);
-        }
-        else
-        {
-            RootLayoutTransformControl.IsVisible = true;
-            var stripHeight = GetMainWindowLineHeight();
-            _recipePanelMargin = new Thickness(0, stripHeight + 6, 0, 0);
-            _recipePanelMaxHeight = 300;
-        }
-
-        RecipeMainOverlay.Margin = _recipePanelMargin;
+        // 无论前台是否全屏，食谱都在课表条下方正常弹出。
+        RootLayoutTransformControl.IsVisible = true;
+        ApplyRecipePanelLayout();
 
         var transitions = RecipeMainOverlay.Transitions;
         RecipeMainOverlay.Transitions = null;
@@ -1730,7 +1713,51 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
         RecipeMainOverlay.IsVisible = true;
         RecipeMainOverlay.Transitions = transitions;
 
+        // 主界面平时鼠标穿透，食谱面板上的关闭/缩放按钮需要可点击，显示期间关闭穿透。
+        PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.ClickThrough, false);
+
         Dispatcher.UIThread.Post(ExpandRecipePanel, DispatcherPriority.Loaded);
+    }
+
+    /// <summary>
+    /// 按当前缩放比例计算食谱面板的宽度、最大高度与距顶偏移：
+    /// 宽度跟食谱自己的缩放走（不跟课表条拉伸），顶部偏移要算上主界面整体缩放后的课表条实际高度。
+    /// </summary>
+    private void ApplyRecipePanelLayout()
+    {
+        var recipeScale = Math.Clamp(ViewModel.Settings.RecipeScale, 0.7, 2.0);
+        var availableWidth = Bounds.Width > 100 ? Bounds.Width - 96 : 1080;
+        RecipeMainOverlay.Width = Math.Min(RECIPE_PANEL_BASE_WIDTH * recipeScale, availableWidth);
+        _recipePanelMaxHeight = RECIPE_PANEL_BASE_MAX_HEIGHT * recipeScale;
+
+        var mainWindowScale = Math.Clamp(ViewModel.Settings.Scale, 0.5, 3.0);
+        var stripHeight = GetMainWindowLineHeight() * mainWindowScale;
+        _recipePanelMargin = new Thickness(0, stripHeight + 6, 0, 0);
+        RecipeMainOverlay.Margin = _recipePanelMargin;
+    }
+
+    private void ButtonRecipeZoomIn_OnClick(object? sender, RoutedEventArgs e) => ChangeRecipeScale(0.1);
+
+    private void ButtonRecipeZoomOut_OnClick(object? sender, RoutedEventArgs e) => ChangeRecipeScale(-0.1);
+
+    private void ChangeRecipeScale(double delta)
+    {
+        ViewModel.Settings.RecipeScale = Math.Clamp(ViewModel.Settings.RecipeScale + delta, 0.7, 2.0);
+        if (!RecipeService.IsVisible || RecipeMainOverlay == null)
+        {
+            return;
+        }
+
+        ApplyRecipePanelLayout();
+        RecipeMainOverlay.MaxHeight = _recipePanelMaxHeight;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (RecipeService.IsVisible && RecipeMainOverlay.Bounds.Height > 0)
+            {
+                _recipePanelBottom = _recipePanelMargin.Top + RecipeMainOverlay.Bounds.Height;
+                UpdateWindowPos();
+            }
+        }, DispatcherPriority.Loaded);
     }
 
     private void ExpandRecipePanel()
@@ -1829,18 +1856,10 @@ public partial class MainWindow : Window, ITopmostEffectPlayer
             RootLayoutTransformControl.IsVisible = true;
             _recipePanelBottom = 0;
             UpdateWindowPos();
-        }, TimeSpan.FromMilliseconds(220));
-    }
 
-    private double GetRecipePanelTargetWidth()
-    {
-        var lines = RootMainWindowLinesItemsControl?
-            .GetVisualDescendants()
-            .OfType<MainWindowLine>()
-            .ToList();
-        var line = lines?.FirstOrDefault(x => x.IsMainLine) ?? lines?.FirstOrDefault();
-        var width = line?.BackgroundWidth ?? 0;
-        return width > 120 ? width : 560;
+            // 恢复主界面的鼠标穿透。
+            PlatformServices.WindowPlatformService.SetWindowFeature(this, WindowFeatures.ClickThrough, !ViewModel.IsEditMode);
+        }, TimeSpan.FromMilliseconds(220));
     }
 
     private double GetMainWindowLineHeight()

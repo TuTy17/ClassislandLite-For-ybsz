@@ -15,7 +15,7 @@ public static class ShortcutHelpers
         if (OperatingSystem.IsWindows())
         {
             var desktopPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                "Classisland Lite by Yu.lnk");
+                "ClassIsland Lite.lnk");
 
             using var shortcut = new WindowsShortcut();
             shortcut.Path = AppBase.ExecutingEntrance;
@@ -37,7 +37,7 @@ public static class ShortcutHelpers
         if (OperatingSystem.IsWindows())
         {
             var startMenuPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu),
-                "Classisland Lite by Yu.lnk");
+                "ClassIsland Lite.lnk");
 
             using var shortcut = new WindowsShortcut();
             shortcut.Path = AppBase.ExecutingEntrance;

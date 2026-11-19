@@ -130,7 +130,7 @@ public partial class ThemesSettingsPage : SettingsPageBase
                 SuggestedFileName = info.Manifest.Id + ".zip",
                 Title = "打包主题",
                 FileTypeChoices = [
-                    new FilePickerFileType("Classisland Lite by Yu 主题包")
+                    new FilePickerFileType("ClassIsland Lite 主题包")
                     {
                         Patterns = ["*.zip"]
                     }

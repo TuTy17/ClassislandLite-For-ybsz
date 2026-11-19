@@ -151,7 +151,7 @@
     <value>Plugins</value>
   </data>
   <data name="About_string" xml:space="preserve">
-    <value>About Classisland Lite by Yu</value>
+    <value>About ClassIsland Lite</value>
   </data>
   <data name="Theme_string" xml:space="preserve">
     <value>Theme</value>
@@ -160,7 +160,7 @@
     <value>Behavior</value>
   </data>
   <data name="OpenSourceStatement" xml:space="preserve">
-    <value>Classisland Lite by Yu is a free project maintained by Huang Yanyu and based on the open-source ClassIsland project. No paid support is provided. The upstream source code is hosted at {sourcecodeurl}.</value>
+    <value>ClassIsland Lite is a free project maintained by Huang Yanyu and based on the open-source ClassIsland project. No paid support is provided. The upstream source code is hosted at {sourcecodeurl}.</value>
   </data>
   <data name="ExperimentalFeature_string" xml:space="preserve">
     <value>Experimental feature</value>

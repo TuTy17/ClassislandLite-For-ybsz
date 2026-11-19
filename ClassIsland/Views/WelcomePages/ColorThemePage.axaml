@@ -16,7 +16,7 @@
         <TextBlock Text="颜色主题" HorizontalAlignment="Center"
                    Margin="0 0 0 4"
                    Theme="{StaticResource SubtitleTextBlockStyle}"/>
-        <TextBlock Text="设置 Classisland Lite by Yu 的主题外观。" HorizontalAlignment="Center"
+        <TextBlock Text="设置 ClassIsland Lite 的主题外观。" HorizontalAlignment="Center"
                    Margin="0 0 0 8"/>
         
         <ListBox SelectedIndex="{Binding ViewModel.SettingsService.Settings.Theme}">

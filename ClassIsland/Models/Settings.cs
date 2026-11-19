@@ -221,15 +221,13 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
     private bool _isNonExactCountdownEnabled = false;
     private bool _showDetailedStatusOnSplash = false;
     private bool _isCarnivalModeEnabled = false;
-    private bool _isEntertainmentModeEnabled = false;
-    private string _entertainmentModeText = "Classisland Lite by Yu";
     private bool _isRecipePreviewEnabled = false;
     private string _recipeWorkbookPath = "";
-    private string _recipeLunchTriggerLessonKey = "";
-    private string _recipeDinnerTriggerLessonKey = "";
+    private ObservableCollection<string> _recipeLunchTriggerLessonKeys = [];
+    private ObservableCollection<string> _recipeDinnerTriggerLessonKeys = [];
+    private double _recipeScale = 1.0;
     private int _recipeShowDelaySeconds = 3;
     private int _recipeHideBeforeClassSeconds = 10;
-    private ObservableCollection<string> _fullscreenEmphasisLessonKeys = [];
     private bool _isDecibelMonitorEnabled = false;
     private string _decibelInputDeviceName = "";
     private double _decibelCalibrationOffset = 0.0;
@@ -2679,28 +2677,6 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         }
     }
 
-    public bool IsEntertainmentModeEnabled
-    {
-        get => _isEntertainmentModeEnabled;
-        set
-        {
-            if (value == _isEntertainmentModeEnabled) return;
-            _isEntertainmentModeEnabled = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public string EntertainmentModeText
-    {
-        get => _entertainmentModeText;
-        set
-        {
-            if (value == _entertainmentModeText) return;
-            _entertainmentModeText = value;
-            OnPropertyChanged();
-        }
-    }
-
     public bool IsRecipePreviewEnabled
     {
         get => _isRecipePreviewEnabled;
@@ -2723,24 +2699,39 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         }
     }
 
-    public string RecipeLunchTriggerLessonKey
+    public ObservableCollection<string> RecipeLunchTriggerLessonKeys
     {
-        get => _recipeLunchTriggerLessonKey;
+        get => _recipeLunchTriggerLessonKeys;
         set
         {
-            if (value == _recipeLunchTriggerLessonKey) return;
-            _recipeLunchTriggerLessonKey = value;
+            if (Equals(value, _recipeLunchTriggerLessonKeys)) return;
+            _recipeLunchTriggerLessonKeys = value;
             OnPropertyChanged();
         }
     }
 
-    public string RecipeDinnerTriggerLessonKey
+    public ObservableCollection<string> RecipeDinnerTriggerLessonKeys
     {
-        get => _recipeDinnerTriggerLessonKey;
+        get => _recipeDinnerTriggerLessonKeys;
         set
         {
-            if (value == _recipeDinnerTriggerLessonKey) return;
-            _recipeDinnerTriggerLessonKey = value;
+            if (Equals(value, _recipeDinnerTriggerLessonKeys)) return;
+            _recipeDinnerTriggerLessonKeys = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 食谱面板的独立缩放比例（字号与整体尺寸一起缩放）。
+    /// </summary>
+    public double RecipeScale
+    {
+        get => _recipeScale;
+        set
+        {
+            value = Math.Clamp(value, 0.7, 2.0);
+            if (value.Equals(_recipeScale)) return;
+            _recipeScale = value;
             OnPropertyChanged();
         }
     }
@@ -2767,16 +2758,6 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
         }
     }
 
-    public ObservableCollection<string> FullscreenEmphasisLessonKeys
-    {
-        get => _fullscreenEmphasisLessonKeys;
-        set
-        {
-            if (Equals(value, _fullscreenEmphasisLessonKeys)) return;
-            _fullscreenEmphasisLessonKeys = value;
-            OnPropertyChanged();
-        }
-    }
 
     public bool IsDecibelMonitorEnabled
     {

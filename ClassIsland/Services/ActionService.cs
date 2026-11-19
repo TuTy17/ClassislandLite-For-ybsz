@@ -248,9 +248,9 @@ public class ActionService : IActionService
         ));
 
         ActionMenuTree.Add(
-            new ActionMenuTreeGroup("Classisland Lite by Yu", "\ue454",
-            new ActionMenuTreeItem("classisland.app.quit", "退出 Classisland Lite by Yu", "\ue0df"),
-            new ActionMenuTreeItem("classisland.app.restart", "重启 Classisland Lite by Yu", "\ue0bd")
+            new ActionMenuTreeGroup("ClassIsland Lite", "\ue454",
+            new ActionMenuTreeItem("classisland.app.quit", "退出 ClassIsland Lite", "\ue0df"),
+            new ActionMenuTreeItem("classisland.app.restart", "重启 ClassIsland Lite", "\ue0bd")
         ));
 
         return;

@@ -269,15 +269,36 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
     private void UpdateLastLessonState()
     {
         var currentPlan = LessonsService.CurrentClassPlan;
-        var lastLesson = currentPlan?.ValidTimeLayoutItems?
-            .Where(item => item.TimeType == 0 && !item.IsHideDefault)
-            .LastOrDefault();
+        var lessons = currentPlan?.Classes?
+            .Where(info => info.CurrentTimeLayoutItem is { TimeType: 0 } && info.SubjectId != Guid.Empty && !info.CurrentTimeLayoutItem.IsHideDefault)
+            .OrderBy(info => info.CurrentTimeLayoutItem.StartTime)
+            .ToList() ?? [];
+        var lastLesson = lessons.LastOrDefault();
         var now = ExactTimeService.GetCurrentLocalDateTime();
 
-        _isLastLessonPeriod = Settings.TomorrowScheduleShowMode == 4
-                              && lastLesson != null
-                              && now.TimeOfDay >= lastLesson.StartTime
-                              && now.TimeOfDay <= lastLesson.EndTime;
+        // 最后一节课如果属于一组连续的同科目课程（重复课程分组），
+        // 那么组内任意一节课都视为“最后一节课”，提前显示次日课表。
+        var inLastLessonGroup = false;
+        if (lastLesson != null)
+        {
+            var groupStart = lessons.Count - 1;
+            while (groupStart > 0 && lessons[groupStart - 1].SubjectId == lastLesson.SubjectId)
+            {
+                groupStart--;
+            }
+
+            for (var i = groupStart; i < lessons.Count; i++)
+            {
+                var item = lessons[i].CurrentTimeLayoutItem;
+                if (now.TimeOfDay >= item.StartTime && now.TimeOfDay <= item.EndTime)
+                {
+                    inLastLessonGroup = true;
+                    break;
+                }
+            }
+        }
+
+        _isLastLessonPeriod = Settings.TomorrowScheduleShowMode == 4 && inLastLessonGroup;
 
         ShowCurrentLessonOnlyOnClass = _showCurrentLessonOnlyFromSettings || _isLastLessonPeriod;
         PseudoClasses.Set(":show-tomorrow-schedule-at-last-class", _isLastLessonPeriod);

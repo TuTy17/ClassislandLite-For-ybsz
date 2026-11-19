@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ClassIsland.Models;
@@ -9,6 +10,22 @@ public sealed class LessonTimePointChoice : ObservableRecipient
 
     public required string Key { get; init; }
     public required string DisplayName { get; init; }
+
+    /// <summary>
+    /// 短名称，用于表格式选择界面，例如“第 3 节”。
+    /// </summary>
+    public string ShortName { get; init; } = "";
+
+    /// <summary>
+    /// 时间范围，例如“09:50-10:30”。
+    /// </summary>
+    public string TimeText { get; init; } = "";
+
+    /// <summary>
+    /// 所属时间表名称。
+    /// </summary>
+    public string GroupName { get; init; } = "";
+
     public Action<LessonTimePointChoice, bool>? SelectionChanged { get; init; }
 
     public bool IsSelected
@@ -24,4 +41,13 @@ public sealed class LessonTimePointChoice : ObservableRecipient
     }
 
     public override string ToString() => DisplayName;
+}
+
+/// <summary>
+/// 一组课程时间点（同一张时间表），用于表格式选择界面。
+/// </summary>
+public sealed class LessonTimePointGroup
+{
+    public required string Name { get; init; }
+    public ObservableCollection<LessonTimePointChoice> Items { get; } = [];
 }

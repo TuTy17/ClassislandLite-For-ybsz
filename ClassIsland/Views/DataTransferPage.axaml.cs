@@ -260,7 +260,7 @@ public partial class DataTransferPage : UserControl
         ViewModel.PerformImportAction = BeginPerformClassIsland2Import;
         ViewModel.PageIndex = 1;
         ViewModel.ImportSourcePath = "";
-        ViewModel.ImportDescription = "支持从 Classisland Lite by Yu 数据文件导入课表、组件配置、自动化配置、应用设置、部分插件和主题等数据。";
+        ViewModel.ImportDescription = "支持从 ClassIsland Lite 数据文件导入课表、组件配置、自动化配置、应用设置、部分插件和主题等数据。";
         ViewModel.IsExport = false;
     }
     
@@ -275,8 +275,8 @@ public partial class DataTransferPage : UserControl
         PopupHelper.DisableAllPopups();
         var file = await PlatformServices.FilePickerService.OpenFilesPickerAsync(new FilePickerOpenOptions()
         {
-            Title = "浏览 Classisland Lite by Yu 导出文件",
-            FileTypeFilter = [ new FilePickerFileType("Classisland Lite by Yu 数据文件")
+            Title = "浏览 ClassIsland Lite 导出文件",
+            FileTypeFilter = [ new FilePickerFileType("ClassIsland Lite 数据文件")
                 {
                     Patterns = ["*.cidata"]
                 } 
@@ -416,7 +416,7 @@ public partial class DataTransferPage : UserControl
         ViewModel.PerformImportAction = PerformClassIsland2ExportAction;
         ViewModel.PageIndex = 1;
         ViewModel.ImportSourcePath = "";
-        ViewModel.ImportDescription = "支持导出为可以导入到其它 Classisland Lite by Yu 实例的文件格式。";
+        ViewModel.ImportDescription = "支持导出为可以导入到其它 ClassIsland Lite 实例的文件格式。";
         ViewModel.IsExport = true;
     }
 
@@ -433,7 +433,7 @@ public partial class DataTransferPage : UserControl
         var file = await PlatformServices.FilePickerService.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = "浏览保存的导出文件",
-            FileTypeChoices = [ new FilePickerFileType("Classisland Lite by Yu 数据文件")
+            FileTypeChoices = [ new FilePickerFileType("ClassIsland Lite 数据文件")
                 {
                     Patterns = ["*.cidata"]
                 } 

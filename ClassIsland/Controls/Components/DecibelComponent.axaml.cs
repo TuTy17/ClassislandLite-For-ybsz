@@ -65,11 +65,23 @@ public partial class DecibelComponent : ComponentBase, INotifyPropertyChanged
     {
         var plan = _lessonsService.CurrentClassPlan;
         var item = _lessonsService.CurrentTimeLayoutItem;
-        IsVisible = _attached &&
-                    plan?.TimeLayout != null &&
-                    item?.TimeType == 0 &&
-                    _settingsService.Settings.DecibelVisibleLessonKeys.Contains(
-                        LessonTimePointHelper.CreateKey(plan.TimeLayoutId, item));
+        var active = _attached &&
+                     plan?.TimeLayout != null &&
+                     item?.TimeType == 0 &&
+                     _settingsService.Settings.DecibelVisibleLessonKeys.Contains(
+                         LessonTimePointHelper.CreateKey(plan.TimeLayoutId, item));
+
+        // 不在显示时段时不能只把控件本身设成不可见：组件宿主会保留最后宽度并显示占位方块。
+        // 这里让内容折叠、控件尺寸归零，宿主在组件行里就不会留下空方块。
+        if (Content is Control content)
+        {
+            content.IsVisible = active;
+        }
+
+        Width = active ? double.NaN : 0;
+        Height = active ? double.NaN : 0;
+        Opacity = active ? 1 : 0;
+        IsHitTestVisible = active;
     }
 
     private void DecibelServiceOnPropertyChanged(object? sender, PropertyChangedEventArgs e)

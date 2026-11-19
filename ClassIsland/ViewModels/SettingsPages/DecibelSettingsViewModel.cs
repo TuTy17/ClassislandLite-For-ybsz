@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -16,9 +17,10 @@ public sealed class DecibelSettingsViewModel : ObservableRecipient
     public SettingsService SettingsService { get; }
     public DecibelService DecibelService { get; }
     public ObservableCollection<string> DeviceNames { get; } = [];
+    public ObservableCollection<LessonTimePointGroup> VisibilityGroups { get; } = [];
     public ObservableCollection<LessonTimePointChoice> VisibilityLessonChoices { get; } = [];
 
-    public bool HasVisibilityLessonChoices => VisibilityLessonChoices.Count > 0;
+    public bool HasVisibilityLessonChoices => VisibilityGroups.Any(group => group.Items.Count > 0);
 
     public string CurrentDecibelText => DecibelService.IsMonitoring
         ? $"{DecibelService.CurrentDecibel:0.0} dB"
@@ -44,31 +46,45 @@ public sealed class DecibelSettingsViewModel : ObservableRecipient
     /// </summary>
     public void RefreshLessonChoices()
     {
+        VisibilityGroups.Clear();
         VisibilityLessonChoices.Clear();
+
         foreach (var (layoutId, layout) in _profileService.Profile.TimeLayouts.OrderBy(pair => pair.Value.Name))
         {
+            var group = new LessonTimePointGroup { Name = layout.Name };
             var lessonNumber = 0;
             foreach (var item in layout.Layouts.Where(item => item.TimeType == 0))
             {
                 lessonNumber++;
                 var key = LessonTimePointHelper.CreateKey(layoutId, item);
-                VisibilityLessonChoices.Add(new LessonTimePointChoice
+                var shortName = $"第 {lessonNumber} 节";
+                var choice = new LessonTimePointChoice
                 {
                     Key = key,
-                    DisplayName = $"{layout.Name} · 第 {lessonNumber} 节 · {LessonTimePointHelper.FormatRange(item.StartTime, item.EndTime)}",
+                    DisplayName = $"{layout.Name} · {shortName} · {LessonTimePointHelper.FormatRange(item.StartTime, item.EndTime)}",
+                    ShortName = shortName,
+                    TimeText = LessonTimePointHelper.FormatRange(item.StartTime, item.EndTime),
+                    GroupName = layout.Name,
                     IsSelected = SettingsService.Settings.DecibelVisibleLessonKeys.Contains(key),
-                    SelectionChanged = (choice, selected) =>
+                    SelectionChanged = (changed, selected) =>
                     {
-                        if (selected && !SettingsService.Settings.DecibelVisibleLessonKeys.Contains(choice.Key))
+                        if (selected && !SettingsService.Settings.DecibelVisibleLessonKeys.Contains(changed.Key))
                         {
-                            SettingsService.Settings.DecibelVisibleLessonKeys.Add(choice.Key);
+                            SettingsService.Settings.DecibelVisibleLessonKeys.Add(changed.Key);
                         }
                         else if (!selected)
                         {
-                            SettingsService.Settings.DecibelVisibleLessonKeys.Remove(choice.Key);
+                            SettingsService.Settings.DecibelVisibleLessonKeys.Remove(changed.Key);
                         }
                     }
-                });
+                };
+                group.Items.Add(choice);
+                VisibilityLessonChoices.Add(choice);
+            }
+
+            if (group.Items.Count > 0)
+            {
+                VisibilityGroups.Add(group);
             }
         }
 

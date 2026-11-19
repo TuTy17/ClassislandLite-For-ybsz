@@ -89,7 +89,7 @@ public partial class StorageSettingsPage : SettingsPageBase
                 DefaultExtension = ".json",
                 FileTypeChoices =
                 [
-                    new FilePickerFileType("Classisland Lite 配置")
+                    new FilePickerFileType("ClassIsland Lite 配置")
                     {
                         Patterns = ["*.json"]
                     }
@@ -124,7 +124,7 @@ public partial class StorageSettingsPage : SettingsPageBase
                 AllowMultiple = false,
                 FileTypeFilter =
                 [
-                    new FilePickerFileType("Classisland Lite 配置")
+                    new FilePickerFileType("ClassIsland Lite 配置")
                     {
                         Patterns = ["*.json"]
                     }

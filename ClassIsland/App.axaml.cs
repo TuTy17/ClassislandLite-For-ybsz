@@ -399,7 +399,7 @@ public partial class App : AppBase, IAppHost
             var crashInfo = e.ToString();
             if (plugins.Count > 0)
             {
-                var pluginsWarning = "此问题可能由以下插件引起，请在向 Classisland Lite by Yu 维护者反馈问题前先向以下插件的开发者反馈此问题："+Environment.NewLine
+                var pluginsWarning = "此问题可能由以下插件引起，请在向 ClassIsland Lite 维护者反馈问题前先向以下插件的开发者反馈此问题："+Environment.NewLine
                                      + string.Join(Environment.NewLine, plugins.Select(x => $"- {x.Manifest.Name} [{x.Manifest.Id},{x.Manifest.Version}]"))
                                      + (disabled
                                          ? Environment.NewLine+"以上异常插件已自动禁用，重启应用后生效。您可以在排除问题后前往【应用设置】->【插件】中重新启用这些插件，或在【应用设置】->【基本】中调整是否自动禁用异常插件。"
@@ -443,7 +443,7 @@ public partial class App : AppBase, IAppHost
                 Logger?.LogInformation("因教学安全模式设定，应用将忽略异常并显示一条通知");
                 try
                 {
-                    await PlatformServices.DesktopToastService.ShowToastAsync("崩溃报告", $"Classisland Lite by Yu 发生了一个无法处理的错误：{e.Message}");
+                    await PlatformServices.DesktopToastService.ShowToastAsync("崩溃报告", $"ClassIsland Lite 发生了一个无法处理的错误：{e.Message}");
                 }
                 catch (Exception exception)
                 {
@@ -532,7 +532,7 @@ public partial class App : AppBase, IAppHost
         // 检测临时目录
         if (Environment.CurrentDirectory.Contains(Path.GetTempPath()))
         {
-            await CommonTaskDialogs.ShowDialog("检测到应用正在临时目录下运行", "Classisland Lite by Yu 正在临时目录下运行，应用设置、课表等数据很可能无法保存，或在应用退出后被自动删除。在使用本应用前，请务必将本应用解压到一个适合的位置。");
+            await CommonTaskDialogs.ShowDialog("检测到应用正在临时目录下运行", "ClassIsland Lite 正在临时目录下运行，应用设置、课表等数据很可能无法保存，或在应用退出后被自动删除。在使用本应用前，请务必将本应用解压到一个适合的位置。");
             Environment.Exit(0);
             return;
         }
@@ -540,7 +540,7 @@ public partial class App : AppBase, IAppHost
         // 检测桌面文件夹
         if (Environment.CurrentDirectory == Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) && !Settings.IsWelcomeWindowShowed)
         {
-            var r = await CommonTaskDialogs.ShowDialog("检测到正在桌面上运行", "Classisland Lite by Yu 正在桌面上运行，应用设置、课表等数据将会直接存放到桌面上。在使用本应用前，请将本应用移动到一个单独的文件夹中。");
+            var r = await CommonTaskDialogs.ShowDialog("检测到正在桌面上运行", "ClassIsland Lite 正在桌面上运行，应用设置、课表等数据将会直接存放到桌面上。在使用本应用前，请将本应用移动到一个单独的文件夹中。");
             if (r == (object)true)
             {
                 Environment.Exit(0);
@@ -557,7 +557,7 @@ public partial class App : AppBase, IAppHost
         }
         catch (Exception ex)
         {
-            await CommonTaskDialogs.ShowDialog("目录权限错误", $"Classisland Lite by Yu 无法写入当前目录：{ex.Message}"+Environment.NewLine+Environment.NewLine+"请将本软件解压到一个合适的位置后再运行。");
+            await CommonTaskDialogs.ShowDialog("目录权限错误", $"ClassIsland Lite 无法写入当前目录：{ex.Message}"+Environment.NewLine+Environment.NewLine+"请将本软件解压到一个合适的位置后再运行。");
             Environment.Exit(0);
             return;
         }
@@ -572,7 +572,7 @@ public partial class App : AppBase, IAppHost
             var dialog = new TaskDialog()
             {
                 Title = "进入恢复模式",
-                Content = "Classisland Lite by Yu 多次启动失败，您需要进入恢复模式以尝试修复它吗？",
+                Content = "ClassIsland Lite 多次启动失败，您需要进入恢复模式以尝试修复它吗？",
                 XamlRoot = GetRootWindow(),
                 Buttons =
                 [
@@ -623,7 +623,7 @@ public partial class App : AppBase, IAppHost
             .Build();
         AppBase.CurrentLifetime = ClassIsland.Core.Enums.ApplicationLifetime.StartingOffline;
         Logger = GetService<ILogger<App>>();
-        Logger.LogInformation("Classisland Lite by Yu {}", AppVersionLong);
+        Logger.LogInformation("ClassIsland Lite {}", AppVersionLong);
         if (App.ApplicationCommand.Diagnostic)
         {
             var diagService = GetService<DiagnosticService>();
@@ -661,7 +661,7 @@ public partial class App : AppBase, IAppHost
         {
             var dtWindow = new DataTransferWindow()
             {
-                ImportName = "Classisland Lite by Yu"
+                ImportName = "ClassIsland Lite"
             };
             dtWindow.Show();
             var entries = int.TryParse(ApplicationCommand.ImportEntries, out var r) ? r : 0;
@@ -730,7 +730,7 @@ public partial class App : AppBase, IAppHost
         await GetService<IProfileService>().LoadProfileAsync();
         GetService<IExactTimeService>();
         await GetService<IComponentsService>().LoadManagementConfig();
-        GetService<FullscreenReminderService>();
+        GetService<IWeatherService>();
         GetService<RecipeService>().Initialize();
         GetService<QqNotificationMirrorService>().Initialize();
         
@@ -753,7 +753,7 @@ public partial class App : AppBase, IAppHost
             {
                 var dialog = new TaskDialog()
                 {
-                    Title = "Classisland Lite by Yu",
+                    Title = "ClassIsland Lite",
                     Header = "当前界面缩放是否正常？",
                     Content = "如果您发现当前界面缩放相对系统缩放过小，可点击【不正常】按钮使应用启用兼容缩放模式，以缓解在部分平台上的缩放异常的问题。",
                     XamlRoot = GetRootWindow(),
@@ -827,7 +827,7 @@ public partial class App : AppBase, IAppHost
             File.Delete(startupCountFilePath);
             if (ConfigureFileHelper.Errors.FirstOrDefault(x => x.Critical) != null)
             {
-                PlatformServices.DesktopToastService.ShowToastAsync("配置文件损坏", "Classisland Lite by Yu 部分配置文件已损坏且无法加载，这些配置文件已恢复至默认值。点击此消息以查看详细信息和从过往备份中恢复配置文件。", () => GetService<IUriNavigationService>().NavigateWrapped(new Uri("classisland://app/config-errors")));
+                PlatformServices.DesktopToastService.ShowToastAsync("配置文件损坏", "ClassIsland Lite 部分配置文件已损坏且无法加载，这些配置文件已恢复至默认值。点击此消息以查看详细信息和从过往备份中恢复配置文件。", () => GetService<IUriNavigationService>().NavigateWrapped(new Uri("classisland://app/config-errors")));
             }
 
             if (Settings.IsSplashEnabled)
@@ -844,7 +844,7 @@ public partial class App : AppBase, IAppHost
             {
                 var dtWindow = new DataTransferWindow()
                 {
-                    ImportName = "Classisland Lite by Yu"
+                    ImportName = "ClassIsland Lite"
                 };
                 dtWindow.Show();
                 dtWindow.ImportComplete(ApplicationCommand.ImportV1Complete);
@@ -875,8 +875,6 @@ public partial class App : AppBase, IAppHost
                 GetService<RecipeService>().ShowPreview(recipe, isLunch);
             }
         });
-        uriNavigationService.HandleAppNavigation("preview-fullscreen-reminder", args =>
-            GetService<FullscreenReminderService>().Preview());
         uriNavigationService.HandleAppNavigation("preview-qq-message", args =>
             GetService<QqNotificationMirrorService>().ShowPreviewMessage("黄老师：晚自习结束后记得关灯。"));
         // uriNavigationService.HandleAppNavigation("profile/import-excel", args => GetService<ExcelImportWindow>().Show());
@@ -998,8 +996,8 @@ public partial class App : AppBase, IAppHost
     {
         var dialog = new TaskDialog()
         {
-            Title = "Classisland Lite by Yu 已在运行",
-            Content = "Classisland Lite by Yu 已经启动，请通过任务栏托盘图标进行设置等操作。" +Environment.NewLine+Environment.NewLine+
+            Title = "ClassIsland Lite 已在运行",
+            Content = "ClassIsland Lite 已经启动，请通过任务栏托盘图标进行设置等操作。" +Environment.NewLine+Environment.NewLine+
                       "如果您无法看到主界面，可能是因为您在托盘图标菜单中选择了【隐藏主界面】，或者有隐藏主界面的规则或行动正在生效。",
             XamlRoot = GetRootWindow(),
             Buttons =
@@ -1013,7 +1011,7 @@ public partial class App : AppBase, IAppHost
                     DialogResult = true,
                     ClosesOnInvoked = true,
                     Text = "重启当前实例",
-                    Description = "结束正在运行的 Classisland Lite by Yu 实例，然后再次启动本实例。",
+                    Description = "结束正在运行的 ClassIsland Lite 实例，然后再次启动本实例。",
                     IconSource = new FluentIconSource("\ue0bd"),
                 }
             ]

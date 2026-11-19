@@ -1,6 +1,6 @@
-# Classisland Lite by Yu 隐私说明
+# ClassIsland Lite 隐私说明
 
-**欢迎使用 Classisland Lite by Yu！**
+**欢迎使用 ClassIsland Lite！**
 
 本项目由黄燕煜维护开发，基于开源项目 ClassIsland。
 

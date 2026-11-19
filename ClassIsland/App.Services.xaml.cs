@@ -30,6 +30,7 @@ using ClassIsland.Models.Rules;
 using ClassIsland.Platforms.Abstraction;
 using ClassIsland.Platforms.Abstraction.Services;
 using ClassIsland.Services;
+using ClassIsland.Services.Automation.Actions;
 using ClassIsland.Services.Logging;
 using ClassIsland.Services.Management;
 using ClassIsland.Services.NotificationProviders;
@@ -57,6 +58,7 @@ public partial class App
         services.AddSingleton<INotificationHostService, NotificationHostService>();
         services.AddSingleton<INotificationWorkerService, NotificationWorkerService>();
         services.AddSingleton<IThemeService, ThemeService>();
+        services.AddSingleton<IWeatherService, WeatherService>();
         services.AddSingleton<MiniInfoProviderHostService>();
         services.AddSingleton<FileFolderService>();
         services.AddSingleton<IAttachedSettingsHostService, AttachedSettingsHostService>();
@@ -104,6 +106,7 @@ public partial class App
         services.AddTransient<AdvancedSettingsViewModel>();
         services.AddTransient<AboutSettingsViewModel>();
         services.AddTransient<AppearanceSettingsViewModel>();
+        services.AddTransient<WeatherSettingsViewModel>();
         services.AddTransient<ComponentsSettingsViewModel>();
         services.AddTransient<NotificationSettingsViewModel>();
         services.AddTransient<WindowSettingsViewModel>();
@@ -114,7 +117,6 @@ public partial class App
         services.AddTransient<RefreshingSettingsViewModel>();
         services.AddTransient<ExperimentalSettingsViewModel>();
         services.AddTransient<DecibelSettingsViewModel>();
-        services.AddTransient<FullscreenReminderSettingsViewModel>();
         services.AddTransient<VersionRollbackSettingsViewModel>();
         // Views
         services.AddTransient<ITopmostEffectPlayer>(x => x.GetRequiredService<TopmostEffectWindow>());
@@ -153,6 +155,7 @@ public partial class App
         services.AddSettingsPage<AdvancedSettingsPage>();
         services.AddSettingsPage<ComponentsSettingsPage>();
         services.AddSettingsPage<AppearanceSettingsPage>();
+        services.AddSettingsPage<WeatherSettingsPage>();
         services.AddSettingsPage<NotificationSettingsPage>();
         services.AddSettingsPage<WindowSettingsPage>();
         services.AddSettingsPage<ThemesSettingsPage>();
@@ -166,7 +169,6 @@ public partial class App
         services.AddSettingsPage<ErrorSettingsPage>();
         services.AddSettingsPage<ExperimentalSettingsPage>();
         services.AddSettingsPage<DecibelSettingsPage>();
-        services.AddSettingsPage<FullscreenReminderSettingsPage>();
         services.AddSettingsPage<VersionRollbackSettingsPage>();
         // 主界面组件
         services.AddComponent<TextComponent, TextComponentSettingsControl>();
@@ -174,6 +176,7 @@ public partial class App
         services.AddComponent<ScheduleComponent, ScheduleComponentSettingsControl>();
         services.AddComponent<DateComponent>();
         services.AddComponent<ClockComponent, ClockComponentSettingsControl>();
+        services.AddComponent<WeatherComponent, WeatherComponentSettingsControl>();
         services.AddComponent<CountDownComponent, CountDownComponentSettingsControl>();
         services.AddComponent<SlideComponent, SlideComponentSettingsControl>();
         services.AddComponent<RollingComponent, RollingComponentSettingsControl>();
@@ -183,11 +186,23 @@ public partial class App
         services.AddComponent<DecibelComponent>();
         services.AddSingleton<CollapseHotspotService>();
         services.AddSingleton<RecipeService>();
-        services.AddSingleton<FullscreenReminderService>();
         services.AddSingleton<DecibelService>();
         services.AddSingleton<QqNotificationMirrorService>();
+        // 天气相关
+        services.AddAttachedSettingsControl<WeatherNotificationAttachedSettingsControl>();
+        services.AddRule<CurrentWeatherRuleSettings, CurrentWeatherRuleSettingsControl>("classisland.weather.currentWeather", "当前天气是", "\uE4DC");
+        services.AddRule<CurrentWeatherRuleSettings, CurrentWeatherRuleSettingsControl>("classisland.weather.tomorrowWeather", "明天天气是", "\uE4DC");
+        services.AddRule<StringMatchingSettings, RulesetStringMatchingSettingsControl>("classisland.weather.hasWeatherAlert", "存在气象预警", "\uF431");
+        services.AddRule<RainTimeRuleSettings, RainTimeRuleSettingsControl>("classisland.weather.rainTime", "距离降水开始/结束还剩", "\uF43F");
+        services.AddRule<SunRiseSetRuleSettings, SunRiseSetRuleSettingsControl>("classisland.weather.sunRiseSet", "是否日出/日落", "\uE150");
+        services.AddAction<WeatherNotificationAction, WeatherNotificationActionSettingControl>();
+        services.AddWeatherIconTemplate("classisland.weatherIcons.lucide", "Lucide（默认）", (this.FindResource("LucideWeatherIconTemplate") as IDataTemplate)!);
+        services.AddWeatherIconTemplate("classisland.weatherIcons.fluentDesign", "Fluent Design", (this.FindResource("FluentDesignWeatherIconTemplate") as IDataTemplate)!);
+        services.AddWeatherIconTemplate("classisland.weatherIcons.sfSymbols", "SF Symbols", (this.FindResource("SFSymbolsWeatherIconTemplate") as IDataTemplate)!);
+        services.AddWeatherIconTemplate("classisland.weatherIcons.simpleText", "纯文本", (this.FindResource("SimpleTextWeatherIconTemplate") as IDataTemplate)!);
         // 提醒提供方
         services.AddNotificationProvider<ClassNotificationProvider, ClassNotificationProviderSettingsControl>();
+        services.AddNotificationProvider<WeatherNotificationProvider, WeatherNotificationProviderSettingsControl>();
         services.AddNotificationProvider<AfterSchoolNotificationProvider, AfterSchoolNotificationProviderSettingsControl>();
         services.AddNotificationProvider<ManagementNotificationProvider>();
         // // Transients
@@ -249,7 +264,7 @@ public partial class App
         {
             Id = "classisland.classic",
             Name = "经典",
-            Description = "Classisland Lite by Yu 的经典外观。",
+            Description = "ClassIsland Lite 的经典外观。",
             Banner = "avares://ClassIsland/Assets/XamlThemePreviews/classisland.classic.png",
             Author = "黄燕煜",
             Url = "https://github.com/ClassIsland/ClassIsland"
@@ -258,7 +273,7 @@ public partial class App
         {
             Id = "classisland.fluent",
             Name = "Fluent",
-            Description = "焕然一新的 Classisland Lite by Yu 外观。",
+            Description = "焕然一新的 ClassIsland Lite 外观。",
             Banner = "avares://ClassIsland/Assets/XamlThemePreviews/classisland.fluent.png",
             Author = "黄燕煜",
             Url = "https://github.com/ClassIsland/ClassIsland",
