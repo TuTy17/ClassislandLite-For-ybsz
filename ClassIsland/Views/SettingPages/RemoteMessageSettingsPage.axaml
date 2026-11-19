@@ -10,7 +10,7 @@
             <ui:InfoBar IsOpen="True"
                         Severity="Informational"
                         Title="远程提醒"
-                        Message="启用后，本机会定时向你的消息服务器查询新通知；收到后全屏显示大字提醒，并每 5 秒响一次提示音，点击屏幕任意位置即可关闭。服务器与网页端部署见“远程提醒-部署说明”。" />
+                        Message="启用后，本机会定时向你的消息服务器查询新通知；收到后全屏显示大字提醒，并每 5 秒响一次提示音，点击屏幕任意位置即可关闭。填好服务器地址即可，不需要密码。" />
 
             <ui:SettingsExpander Header="启用远程提醒"
                                  Description="会按设定的间隔访问消息服务器，只接收启用之后的新消息。"
@@ -29,15 +29,6 @@
                     <ui:SettingsExpanderItem.Footer>
                         <TextBox Text="{Binding ViewModel.SettingsService.Settings.RemoteMessageServerUrl, Mode=TwoWay}"
                                  Watermark="https://classisland-msg.example.workers.dev"
-                                 Width="380" />
-                    </ui:SettingsExpanderItem.Footer>
-                </ui:SettingsExpanderItem>
-                <ui:SettingsExpanderItem Content="设备访问密钥"
-                                         Description="与服务器上配置的 DEVICE_KEY 一致。">
-                    <ui:SettingsExpanderItem.Footer>
-                        <TextBox Text="{Binding ViewModel.SettingsService.Settings.RemoteMessageAccessKey, Mode=TwoWay}"
-                                 PasswordChar="●"
-                                 Watermark="DEVICE_KEY"
                                  Width="380" />
                     </ui:SettingsExpanderItem.Footer>
                 </ui:SettingsExpanderItem>

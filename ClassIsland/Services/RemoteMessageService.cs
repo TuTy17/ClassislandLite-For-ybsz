@@ -83,7 +83,6 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
     {
         if (e.PropertyName is nameof(Settings.IsRemoteMessageEnabled)
             or nameof(Settings.RemoteMessageServerUrl)
-            or nameof(Settings.RemoteMessageAccessKey)
             or nameof(Settings.RemoteMessagePollSeconds))
         {
             RestartTimer();
@@ -100,8 +99,7 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
 
         var settings = _settingsService.Settings;
         if (!settings.IsRemoteMessageEnabled ||
-            string.IsNullOrWhiteSpace(settings.RemoteMessageServerUrl) ||
-            string.IsNullOrWhiteSpace(settings.RemoteMessageAccessKey))
+            string.IsNullOrWhiteSpace(settings.RemoteMessageServerUrl))
         {
             StatusText = "未启用";
             return;
@@ -132,10 +130,11 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
             }
 
             var settings = _settingsService.Settings;
-            if (settings.RemoteMessageLastId == 0)
+            if (!settings.RemoteMessageSynced)
             {
                 // 首次连接时只记录当前位置，避免把历史消息一次性全部弹出。
                 settings.RemoteMessageLastId = result.Value.LatestId;
+                settings.RemoteMessageSynced = true;
                 StatusText = $"已连接，等待新消息（最新 {result.Value.LatestId}）";
                 return;
             }
@@ -145,7 +144,7 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
                 Enqueue(message);
             }
 
-            if (result.Value.Messages.Count > 0)
+            if (result.Value.LatestId > settings.RemoteMessageLastId)
             {
                 settings.RemoteMessageLastId = result.Value.LatestId;
             }
@@ -174,7 +173,7 @@ public sealed class RemoteMessageService : ObservableRecipient, IDisposable
 
         var after = settings.RemoteMessageLastId;
         // 广播模式：所有设备拉取同一批消息，各自用 lastId 去重。
-        var url = $"{baseUrl}/api/messages?after={after}&key={Uri.EscapeDataString(settings.RemoteMessageAccessKey)}";
+        var url = $"{baseUrl}/api/messages?after={after}";
         using var response = await _httpClient.GetAsync(url);
         if (!response.IsSuccessStatusCode)
         {

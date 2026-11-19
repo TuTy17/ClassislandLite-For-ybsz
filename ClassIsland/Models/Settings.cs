@@ -223,11 +223,11 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
     private bool _isCarnivalModeEnabled = false;
     private bool _isRemoteMessageEnabled = false;
     private string _remoteMessageServerUrl = "";
-    private string _remoteMessageAccessKey = "";
     private string _remoteMessageDeviceId = "";
     private int _remoteMessagePollSeconds = 5;
     private double _remoteMessageSoundVolume = 0.8;
     private long _remoteMessageLastId = 0;
+    private bool _remoteMessageSynced = false;
     private bool _isRecipePreviewEnabled = false;
     private string _recipeWorkbookPath = "";
     private ObservableCollection<string> _recipeLunchTriggerLessonKeys = [];
@@ -2758,21 +2758,6 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
     }
 
     /// <summary>
-    /// 设备访问密钥，与服务器上配置的 DEVICE_KEY 一致。
-    /// </summary>
-    public string RemoteMessageAccessKey
-    {
-        get => _remoteMessageAccessKey;
-        set
-        {
-            value ??= "";
-            if (value == _remoteMessageAccessKey) return;
-            _remoteMessageAccessKey = value;
-            OnPropertyChanged();
-        }
-    }
-
-    /// <summary>
     /// 本机设备标识，首次启动时自动生成。
     /// </summary>
     public string RemoteMessageDeviceId
@@ -2813,6 +2798,20 @@ public class Settings : ObservableRecipient, ILessonControlSettings, INotificati
             value = Math.Clamp(value, 0, 1);
             if (value.Equals(_remoteMessageSoundVolume)) return;
             _remoteMessageSoundVolume = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 是否已经完成过一次同步。首次同步只记录位置，不弹历史消息。
+    /// </summary>
+    public bool RemoteMessageSynced
+    {
+        get => _remoteMessageSynced;
+        set
+        {
+            if (value == _remoteMessageSynced) return;
+            _remoteMessageSynced = value;
             OnPropertyChanged();
         }
     }
