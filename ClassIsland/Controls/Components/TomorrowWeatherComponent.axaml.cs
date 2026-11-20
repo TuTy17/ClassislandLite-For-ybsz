@@ -72,7 +72,14 @@ public partial class TomorrowWeatherComponent : ComponentBase, INotifyPropertyCh
         var line = this.FindAncestorOfType<MainWindowLine>();
         if (line?.Settings is { Children.Count: 1 })
         {
-            line.IsVisible = visible;
+            if (visible)
+            {
+                line.ClearValue(Visual.IsVisibleProperty);
+            }
+            else
+            {
+                line.IsVisible = false;
+            }
         }
     }
 
