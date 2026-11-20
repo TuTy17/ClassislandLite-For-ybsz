@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 using ClassIsland.Core.Controls;
+using ClassIsland.Controls;
 using ClassIsland.Core.Abstractions.Controls;
 using ClassIsland.Core.Attributes;
 using ClassIsland.Services;
@@ -65,6 +66,13 @@ public partial class TomorrowWeatherComponent : ComponentBase, INotifyPropertyCh
             {
                 settings.LastWidthCache = 0;
             }
+        }
+
+        // 这一行只有“次日天气”一个组件时，直接整行显示/隐藏，杜绝任何残留空块。
+        var line = this.FindAncestorOfType<MainWindowLine>();
+        if (line?.Settings is { Children.Count: 1 })
+        {
+            line.IsVisible = visible;
         }
     }
 
