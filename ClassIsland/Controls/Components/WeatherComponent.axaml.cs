@@ -20,6 +20,8 @@ public partial class WeatherComponent : ComponentBase<WeatherComponentSettings>
 
     public SettingsService SettingsService { get; }
 
+    public TomorrowWeatherService TomorrowWeatherService { get; }
+
     private int _aqiLevel;
 
     public static readonly DirectProperty<WeatherComponent, int> AqiLevelProperty = AvaloniaProperty.RegisterDirect<WeatherComponent, int>(
@@ -33,11 +35,25 @@ public partial class WeatherComponent : ComponentBase<WeatherComponentSettings>
 
     private IDisposable? _observer;
 
-    public WeatherComponent(IWeatherService weatherService, SettingsService settingsService)
+    public WeatherComponent(IWeatherService weatherService, SettingsService settingsService, TomorrowWeatherService tomorrowWeatherService)
     {
         WeatherService = weatherService;
         SettingsService = settingsService;
+        TomorrowWeatherService = tomorrowWeatherService;
         InitializeComponent();
+    }
+
+    private void TomorrowWeatherStateOnPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        UpdateWeatherVisibility();
+    }
+
+    /// <summary>
+    /// 显示次日课表时，第一行的当日天气让位给第二行的次日天气。
+    /// </summary>
+    private void UpdateWeatherVisibility()
+    {
+        IsVisible = !TomorrowWeatherService.IsTomorrowViewActive;
     }
 
     private void UpdateAqiInfo()
@@ -52,11 +68,14 @@ public partial class WeatherComponent : ComponentBase<WeatherComponentSettings>
         _observer = SettingsService.Settings.ObservableForProperty(x => x.LastWeatherInfo)
             .Subscribe(_ => UpdateAqiInfo());
         UpdateAqiInfo();
+        TomorrowWeatherService.PropertyChanged += TomorrowWeatherStateOnPropertyChanged;
+        UpdateWeatherVisibility();
     }
 
     private void Control_OnDetachedFromVisualTree(object? sender, VisualTreeAttachmentEventArgs visualTreeAttachmentEventArgs)
     {
         _observer?.Dispose();
+        TomorrowWeatherService.PropertyChanged -= TomorrowWeatherStateOnPropertyChanged;
     }
 }
 

@@ -1,0 +1,53 @@
+using System.ComponentModel;
+using Avalonia;
+using Avalonia.Controls;
+using ClassIsland.Core.Abstractions.Controls;
+using ClassIsland.Core.Attributes;
+using ClassIsland.Services;
+
+namespace ClassIsland.Controls.Components;
+
+/// <summary>
+/// “次日天气”小组件：放在主界面第二行，只有在显示次日课表时才出现。
+/// </summary>
+[ComponentInfo("8E4B7C21-3A5D-4C9E-9B02-6F1D2A7C5E10", "次日天气", "\uE753",
+    "显示次日课表时，在第二行显示明天的天气（含天气图标与雨雪提示）。")]
+public partial class TomorrowWeatherComponent : ComponentBase, INotifyPropertyChanged
+{
+    public TomorrowWeatherService State { get; }
+
+    public TomorrowWeatherComponent(TomorrowWeatherService state)
+    {
+        State = state;
+        InitializeComponent();
+        DataContext = this;
+
+        AttachedToVisualTree += OnAttached;
+        DetachedFromVisualTree += OnDetached;
+    }
+
+    private void OnAttached(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        State.PropertyChanged += StateOnPropertyChanged;
+        State.Refresh();
+        UpdateVisibility();
+    }
+
+    private void OnDetached(object? sender, VisualTreeAttachmentEventArgs e)
+    {
+        State.PropertyChanged -= StateOnPropertyChanged;
+    }
+
+    private void StateOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        UpdateVisibility();
+    }
+
+    private void UpdateVisibility()
+    {
+        // 不满足“显示次日课表”条件时整块隐藏，让第二行跟着收回。
+        IsVisible = State.IsTomorrowViewActive && State.HasTomorrowWeather;
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+}

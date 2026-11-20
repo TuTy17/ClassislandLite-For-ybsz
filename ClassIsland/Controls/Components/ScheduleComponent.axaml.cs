@@ -70,6 +70,8 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
 
     public IWeatherService WeatherService { get; }
 
+    public TomorrowWeatherService TomorrowWeatherService { get; }
+
     public static readonly StyledProperty<int> LessonsListBoxSelectedIndexProperty = AvaloniaProperty.Register<ScheduleComponent, int>(
         nameof(LessonsListBoxSelectedIndex));
 
@@ -193,13 +195,14 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
         }
     }
 
-    public ScheduleComponent(ILessonsService lessonsService, SettingsService settingsService, IProfileService profileService, IExactTimeService exactTimeService, IWeatherService weatherService)
+    public ScheduleComponent(ILessonsService lessonsService, SettingsService settingsService, IProfileService profileService, IExactTimeService exactTimeService, IWeatherService weatherService, TomorrowWeatherService tomorrowWeatherService)
     {
         LessonsService = lessonsService;
         SettingsService = settingsService;
         ProfileService = profileService;
         ExactTimeService = exactTimeService;
         WeatherService = weatherService;
+        TomorrowWeatherService = tomorrowWeatherService;
         
         AttachedToVisualTree += (_, _) => LessonsService.PostMainTimerTicked += LessonsServiceOnPostMainTimerTicked;
         AttachedToVisualTree += (_, _) => LessonsService.CurrentTimeStateChanged += OnLessonsServiceOnCurrentTimeStateChanged;
@@ -477,12 +480,31 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
         }
     }
 
+    /// <summary>
+    /// 把“当前是否显示次日课表”同步给共享状态，供“次日天气”小组件和“天气简报”联动。
+    /// </summary>
+    private void PushTomorrowViewState(bool onEmpty)
+    {
+        var mode = Settings.TomorrowScheduleShowMode;
+        var active = TomorrowClassPlan != null && mode switch
+        {
+            1 => IsAfterSchool,
+            2 => true,
+            3 => onEmpty,
+            4 => _isLastLessonPeriod,
+            _ => false
+        };
+
+        TomorrowWeatherService.SetViewActive(active);
+    }
+
     private void UpdateTomorrowVisibility()
     {
         var showOnEmpty = Settings.TomorrowScheduleShowMode == 3;
         if (!showOnEmpty)
         {
             PseudoClasses.Set(":show-tomorrow-schedule-on-empty", false);
+            PushTomorrowViewState(false);
             return;
         }
         var now = ExactTimeService.GetCurrentLocalDateTime().TimeOfDay;
@@ -490,6 +512,7 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
         var classPlan = LessonsService.CurrentClassPlan;
         var hasDisplayable = HasDisplayableItems(classPlan, now, selectedItem);
         PseudoClasses.Set(":show-tomorrow-schedule-on-empty", !hasDisplayable);
+        PushTomorrowViewState(!hasDisplayable);
     }
 
     private bool HasDisplayableItems(ClassPlan? classPlan, TimeSpan now, TimeLayoutItem? selectedItem)

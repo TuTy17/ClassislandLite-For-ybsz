@@ -59,6 +59,7 @@ public partial class App
         services.AddSingleton<INotificationWorkerService, NotificationWorkerService>();
         services.AddSingleton<IThemeService, ThemeService>();
         services.AddSingleton<IWeatherService, WeatherService>();
+        services.AddSingleton<TomorrowWeatherService>();
         services.AddSingleton<MiniInfoProviderHostService>();
         services.AddSingleton<FileFolderService>();
         services.AddSingleton<IAttachedSettingsHostService, AttachedSettingsHostService>();
@@ -179,6 +180,7 @@ public partial class App
         services.AddComponent<DateComponent>();
         services.AddComponent<ClockComponent, ClockComponentSettingsControl>();
         services.AddComponent<WeatherComponent, WeatherComponentSettingsControl>();
+        services.AddComponent<TomorrowWeatherComponent>();
         services.AddComponent<CountDownComponent, CountDownComponentSettingsControl>();
         services.AddComponent<SlideComponent, SlideComponentSettingsControl>();
         services.AddComponent<RollingComponent, RollingComponentSettingsControl>();
