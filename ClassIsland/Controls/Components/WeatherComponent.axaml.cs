@@ -1,6 +1,8 @@
 using System;
 using Avalonia;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
+using ClassIsland.Core.Controls;
 using ClassIsland.Core.Abstractions.Controls;
 using ClassIsland.Core.Abstractions.Services;
 using ClassIsland.Core.Attributes;
@@ -53,7 +55,23 @@ public partial class WeatherComponent : ComponentBase<WeatherComponentSettings>
     /// </summary>
     private void UpdateWeatherVisibility()
     {
-        IsVisible = !TomorrowWeatherService.IsTomorrowViewActive;
+        var visible = !TomorrowWeatherService.IsTomorrowViewActive;
+        IsVisible = visible;
+
+        var parent = this.GetVisualParent();
+        while (parent != null && parent is not ComponentPresenter)
+        {
+            parent = parent.GetVisualParent();
+        }
+
+        if (parent is ComponentPresenter presenter)
+        {
+            presenter.IsVisibleInternal = visible;
+            if (presenter.Settings is { } settings && !visible)
+            {
+                settings.LastWidthCache = 0;
+            }
+        }
     }
 
     private void UpdateAqiInfo()

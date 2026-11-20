@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.VisualTree;
+using ClassIsland.Core.Controls;
 using ClassIsland.Core.Abstractions.Controls;
 using ClassIsland.Core.Attributes;
 using ClassIsland.Services;
@@ -45,8 +47,25 @@ public partial class TomorrowWeatherComponent : ComponentBase, INotifyPropertyCh
 
     private void UpdateVisibility()
     {
-        // 不满足“显示次日课表”条件时整块隐藏，让第二行跟着收回。
-        IsVisible = State.IsTomorrowViewActive && State.HasTomorrowWeather;
+        // 不满足“显示次日课表”条件时整块隐藏，并连宿主一起收起来，
+        // 否则宿主会保留上次宽度，在第二行画出一个空的背景方块。
+        var visible = State.IsTomorrowViewActive && State.HasTomorrowWeather;
+        IsVisible = visible;
+
+        var parent = this.GetVisualParent();
+        while (parent != null && parent is not ComponentPresenter)
+        {
+            parent = parent.GetVisualParent();
+        }
+
+        if (parent is ComponentPresenter presenter)
+        {
+            presenter.IsVisibleInternal = visible;
+            if (presenter.Settings is { } settings && !visible)
+            {
+                settings.LastWidthCache = 0;
+            }
+        }
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
