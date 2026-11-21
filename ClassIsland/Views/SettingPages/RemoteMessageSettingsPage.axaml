@@ -25,7 +25,7 @@
                                  IsExpanded="True"
                                  IconSource="{ci:FluentIconSource &#xE774;}">
                 <ui:SettingsExpanderItem Content="服务器地址"
-                                         Description="Cloudflare Worker 的地址，末尾不要带斜杠。">
+                                         Description="Cloudflare Worker 的地址，末尾不要带斜杠。可以填多个，用逗号分隔，程序会按顺序尝试并记住可用的那个。">
                     <ui:SettingsExpanderItem.Footer>
                         <TextBox Text="{Binding ViewModel.SettingsService.Settings.RemoteMessageServerUrl, Mode=TwoWay}"
                                  Watermark="https://classisland-msg.example.workers.dev"
