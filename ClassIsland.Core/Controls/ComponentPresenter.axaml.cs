@@ -334,6 +334,20 @@ public partial class ComponentPresenter : UserControl, INotifyPropertyChanged
         }
     }
 
+    /// <summary>
+    /// 组件自己决定显示/隐藏时调用：同步 <see cref="ComponentSettings.IsVisible"/>，
+    /// 并通知所在的主界面行重算"是否所有组件都已隐藏"，避免隐藏后行背景仍然绘制。
+    /// </summary>
+    public void SetComponentVisible(bool visible)
+    {
+        if (IsVisibleInternal != visible)
+        {
+            IsVisibleInternal = visible;
+        }
+
+        UpdateComponentHidState();
+    }
+
     private void ComponentPresenter_OnLoaded(object sender, RoutedEventArgs e)
     {
         UpdateComponentHidState();

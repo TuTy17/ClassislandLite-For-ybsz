@@ -48,8 +48,8 @@ public partial class TomorrowWeatherComponent : ComponentBase, INotifyPropertyCh
 
     private void UpdateVisibility()
     {
-        // 不满足“显示次日课表”条件时整块隐藏，并连宿主一起收起来，
-        // 否则宿主会保留上次宽度，在第二行画出一个空的背景方块。
+        // 隐藏时要走 ComponentPresenter.SetComponentVisible：它会同步 Settings.IsVisible
+        // 并通知所在行重算，行内组件全部隐藏时整行才会消失。
         var visible = State.IsTomorrowViewActive && State.HasTomorrowWeather;
         IsVisible = visible;
 
@@ -61,24 +61,10 @@ public partial class TomorrowWeatherComponent : ComponentBase, INotifyPropertyCh
 
         if (parent is ComponentPresenter presenter)
         {
-            presenter.IsVisibleInternal = visible;
+            presenter.SetComponentVisible(visible);
             if (presenter.Settings is { } settings && !visible)
             {
                 settings.LastWidthCache = 0;
-            }
-        }
-
-        // 这一行只有“次日天气”一个组件时，直接整行显示/隐藏，杜绝任何残留空块。
-        var line = this.FindAncestorOfType<MainWindowLine>();
-        if (line?.Settings is { Children.Count: 1 })
-        {
-            if (visible)
-            {
-                line.ClearValue(Visual.IsVisibleProperty);
-            }
-            else
-            {
-                line.IsVisible = false;
             }
         }
     }

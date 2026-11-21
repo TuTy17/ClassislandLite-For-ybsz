@@ -108,10 +108,10 @@ public partial class DecibelComponent : ComponentBase, INotifyPropertyChanged
 
         if (parent is ComponentPresenter presenter)
         {
-            presenter.IsVisibleInternal = active;
-            if (presenter.Settings is { } settings)
+            presenter.SetComponentVisible(active);
+            if (presenter.Settings is { } settings && !active)
             {
-                settings.LastWidthCache = active ? settings.LastWidthCache : 0;
+                settings.LastWidthCache = 0;
             }
         }
     }

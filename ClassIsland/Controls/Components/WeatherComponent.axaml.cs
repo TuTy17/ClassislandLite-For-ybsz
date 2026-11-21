@@ -66,7 +66,7 @@ public partial class WeatherComponent : ComponentBase<WeatherComponentSettings>
 
         if (parent is ComponentPresenter presenter)
         {
-            presenter.IsVisibleInternal = visible;
+            presenter.SetComponentVisible(visible);
             if (presenter.Settings is { } settings && !visible)
             {
                 settings.LastWidthCache = 0;
