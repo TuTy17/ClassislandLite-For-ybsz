@@ -130,6 +130,15 @@ internal class LessonsListBoxItemTemplateMultiConverter : AvaloniaObject, IMulti
             return false;
         }
 
+        // 只有勾选了"重复出现时合并显示"的科目才收起后续格子，否则每一节都要单独显示。
+        var subjects = IAppHost.TryGetService<IProfileService>()?.Profile?.Subjects;
+        if (subjects == null ||
+            !subjects.TryGetValue(subjectId, out var subject) ||
+            !subject.MergeRepeatedLessons)
+        {
+            return false;
+        }
+
         var groupStart = currentIndex;
         var groupEnd = currentIndex;
         while (groupStart > 0 && IsSameGroup(classPlan.Classes[groupStart - 1], subjectId))

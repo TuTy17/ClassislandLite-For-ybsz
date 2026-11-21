@@ -275,6 +275,7 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
     /// </summary>
     private void RefreshTomorrowState()
     {
+        CurrentTimeStateChanged();
         RefreshTomorrowClassPlan();
         UpdateLastLessonState();
         UpdateTomorrowVisibility();
@@ -482,20 +483,28 @@ public partial class ScheduleComponent : ComponentBase<LessonControlSettings>, I
 
     /// <summary>
     /// 把“当前是否显示次日课表”同步给共享状态，供“次日天气”小组件和“天气简报”联动。
+    /// 判定必须和课表的伪类保持一致，否则会出现“课表显示了次日、天气却没显示”。
     /// </summary>
-    private void PushTomorrowViewState(bool onEmpty)
+    private bool ComputeTomorrowViewActive(bool onEmpty)
     {
-        var mode = Settings.TomorrowScheduleShowMode;
-        var active = TomorrowClassPlan != null && mode switch
+        if (TomorrowClassPlan == null)
+        {
+            return false;
+        }
+
+        return Settings.TomorrowScheduleShowMode switch
         {
             1 => IsAfterSchool,
             2 => true,
             3 => onEmpty,
-            4 => _isLastLessonPeriod,
+            4 => _isLastLessonPeriod || IsAfterSchool,
             _ => false
         };
+    }
 
-        TomorrowWeatherService.SetViewActive(active);
+    private void PushTomorrowViewState(bool onEmpty)
+    {
+        TomorrowWeatherService.SetViewActive(ComputeTomorrowViewActive(onEmpty));
     }
 
     private void UpdateTomorrowVisibility()
