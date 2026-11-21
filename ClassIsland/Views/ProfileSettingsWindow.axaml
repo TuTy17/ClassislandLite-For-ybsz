@@ -1613,6 +1613,10 @@
                                         <CheckBox Margin="0 6 0 0"
                                                   IsChecked="{Binding IsOutDoor}"
                                                   Content="该科目是户外课程" />
+                                        <!-- 重复出现时合并显示 -->
+                                        <CheckBox Margin="0 6 0 0"
+                                                  IsChecked="{Binding MergeRepeatedLessons}"
+                                                  Content="重复出现时合并显示（数学、数学 → 数学×2）" />
                                         <!-- 附加属性 -->
                                         <Separator Margin="0 20 0 8" />
                                         <ci:IconText Glyph="&#xEF2B;" Text="更多选项" Margin="0 0 0 8" />

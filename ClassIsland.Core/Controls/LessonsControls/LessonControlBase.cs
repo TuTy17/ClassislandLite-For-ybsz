@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reactive.Linq;
 using System.Windows;
 using Avalonia;
@@ -67,6 +68,40 @@ public abstract class LessonControlBase : UserControl
     {
         this.GetObservable(ClassPlanProperty).Subscribe(_ => UpdateClassInfo());
         this.GetObservable(CurrentTimeLayoutItemProperty).Subscribe(_ => UpdateClassInfo());
+        this.GetObservable(SubjectsProperty).Subscribe(_ => UpdateClassInfo());
+        Unloaded += (_, _) => SubscribeSubject(null);
+    }
+
+    private Subject? _subscribedSubject;
+
+    /// <summary>
+    /// 跟踪当前科目，让"重复出现时合并显示"的勾选可以立即生效。
+    /// </summary>
+    private void SubscribeSubject(Subject? subject)
+    {
+        if (ReferenceEquals(_subscribedSubject, subject))
+        {
+            return;
+        }
+
+        if (_subscribedSubject != null)
+        {
+            _subscribedSubject.PropertyChanged -= SubjectOnPropertyChanged;
+        }
+
+        _subscribedSubject = subject;
+        if (subject != null)
+        {
+            subject.PropertyChanged += SubjectOnPropertyChanged;
+        }
+    }
+
+    private void SubjectOnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Subject.MergeRepeatedLessons))
+        {
+            UpdateClassInfo();
+        }
     }
 
     private void UpdateClassInfo()
@@ -75,15 +110,20 @@ public abstract class LessonControlBase : UserControl
         var classPlan = GetClassPlan(this);
         if (classPlan == null || CurrentTimeLayoutItem == null || classPlan.TimeLayout == null)
         {
+            SubscribeSubject(null);
             return;
         }
         var subjectIndex = GetSubjectIndex(classPlan.TimeLayout.Layouts.IndexOf(CurrentTimeLayoutItem));
         if (subjectIndex >= classPlan.Classes.Count || subjectIndex < 0)
         {
+            SubscribeSubject(null);
             return;
         }
 
         ClassInfo = classPlan.Classes[subjectIndex];
+        Subject? currentSubject = null;
+        Subjects?.TryGetValue(ClassInfo.SubjectId, out currentSubject);
+        SubscribeSubject(currentSubject);
         UpdateGroupRemainingText(classPlan, subjectIndex);
         return;
 
@@ -107,9 +147,18 @@ public abstract class LessonControlBase : UserControl
             return;
         }
 
+        var subjectId = classPlan.Classes[subjectIndex].SubjectId;
+
+        // 只有勾选了"重复出现时合并显示"的科目才合并，其它科目逐节显示。
+        if (Subjects == null ||
+            !Subjects.TryGetValue(subjectId, out var subject) ||
+            !subject.MergeRepeatedLessons)
+        {
+            return;
+        }
+
         var groupStart = subjectIndex;
         var groupEnd = subjectIndex;
-        var subjectId = classPlan.Classes[subjectIndex].SubjectId;
 
         while (groupStart > 0 && IsSameGroup(classPlan.Classes[groupStart - 1], subjectId))
         {

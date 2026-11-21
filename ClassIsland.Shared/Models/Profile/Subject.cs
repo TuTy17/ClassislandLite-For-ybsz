@@ -11,6 +11,7 @@ public class Subject : AttachableSettingsObject
     private string _initial = "";
     private string _teacherName = "";
     private bool _isOutDoor = false;
+    private bool _mergeRepeatedLessons;
     private static readonly HashSet<string> commonCompoundSurnames = new() { "万俟", "司马", "上官", "欧阳", "夏侯", "诸葛", "闻人", "东方", "赫连", "皇甫", "尉迟", "公羊", "澹台", "公冶", "宗政", "濮阳", "淳于", "单于", "太叔", "申屠", "公孙", "仲孙", "轩辕", "令狐", "钟离", "宇文", "长孙", "慕容", "鲜于", "闾丘", "司徒", "司空", "亓官", "司寇", "子车", "颛孙", "端木", "巫马", "公西", "漆雕", "乐正", "壤驷", "公良", "拓跋", "夹谷", "宰父", "谷梁", "段干", "百里", "东郭", "南门", "呼延", "羊舌", "微生", "梁丘", "左丘", "东门", "西门", "南宫", "第五" };
 
     /// <summary>
@@ -67,6 +68,20 @@ public class Subject : AttachableSettingsObject
         {
             if (value == _isOutDoor) return;
             _isOutDoor = value;
+            OnPropertyChanged();
+        }
+    }
+
+    /// <summary>
+    /// 连续出现相同科目时是否合并显示（数学、数学 → 数学×2）。
+    /// </summary>
+    public bool MergeRepeatedLessons
+    {
+        get => _mergeRepeatedLessons;
+        set
+        {
+            if (value == _mergeRepeatedLessons) return;
+            _mergeRepeatedLessons = value;
             OnPropertyChanged();
         }
     }
