@@ -98,6 +98,9 @@
 环境要求：**.NET 9 SDK**（用于构建）与 **.NET 8 运行时**、Windows 10/11。
 
 ```bash
+# 0. 拉取子模块（编译前必须）
+git submodule update --init --recursive
+
 # 1. 编译主程序（Release）
 dotnet build src/ClassIsland/ClassIsland.csproj -c Release -p:ClassIsland_PlatformTarget=x64
 
