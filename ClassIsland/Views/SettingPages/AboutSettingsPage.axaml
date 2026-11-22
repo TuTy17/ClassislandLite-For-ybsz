@@ -19,7 +19,7 @@
       d:DataContext="{d:DesignInstance local:AboutSettingsPage}">
     <controls:SettingsPageBase.Resources>
         <Grid Margin="16" x:Key="ContributorsDrawer" Width="300" RowDefinitions="Auto,Auto,Auto,*">
-            <TextBlock Grid.Row="0" Text="贡献人员" Theme="{StaticResource SubtitleTextBlockStyle}" />
+            <TextBlock Grid.Row="0" Text="原版本贡献人员" Theme="{StaticResource SubtitleTextBlockStyle}" />
             <TextBlock Grid.Row="1" Margin="0 6 0 0" Text="感谢以下同学为本项目做出的贡献！"/>
             <Button Grid.Row="2" HorizontalAlignment="Left" 
                     Click="ButtonRefreshContributors_OnClick"
@@ -195,7 +195,8 @@
                 <controls3:SettingsExpander.IconSource>
                     <controls3:ImageIconSource Source="/Assets/AppLogo.png"/>
                 </controls3:SettingsExpander.IconSource>
-                <controls3:SettingsExpanderItem Description="ClassIsland Lite 由 Yu 维护，基于 ClassIsland 开源项目修改，并遵循 GNU General Public License v3.0。">
+                <controls3:SettingsExpanderItem Description="ClassislandLite是基于Classisland为四川省宜宾市第四中学校定制开发的一款课表软件，遵循GNU General Public license v3.0
+                由高2026级某位同学维护，联系方式：tty180819@gmail.com">
                     <controls3:SettingsExpanderItem.Footer>
                         <WrapPanel Classes="animated-resize">
                             <WrapPanel.Styles>
@@ -226,7 +227,7 @@
                             </WrapPanel.Styles>
                             <HyperlinkButton Click="UriNavigationCommands_OnClick"
                                              CommandParameter="https://github.com/ClassIsland/ClassIsland">
-                                <TextBlock Text="项目主页"/>
+                                <TextBlock Text="Classisland项目主页"/>
                             </HyperlinkButton>
 
                             <HyperlinkButton Click="UriNavigationCommands_OnClick"
@@ -282,6 +283,7 @@
                         天气数据来源于小米天气。<LineBreak/>
                         部分图像资源（/Assets/HoYoStickers/*）来自米游社和 Bilibili 装扮表情包，版权归 miHoYo 所有。<LineBreak/>
                         感谢其他使用的第三方库和贡献成员，详见贡献名单和第三方库。
+                        感谢Classisland全体开发同学
                     </TextBlock>
                 </controls3:SettingsExpanderItem>
 
